@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Контакты | Портфолио художника</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Портфолио</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" th:href="@{/}">Главная</a>
+            <a class="nav-link" th:href="@{/gallery}">Галерея</a>
+            <a class="nav-link" th:href="@{/blog}">Блог</a>
+            <a class="nav-link active" th:href="@{/contact}">Контакты</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <h1 class="mb-4">Контакты</h1>
+
+            <!-- Сообщение об успешной отправке -->
+            <div th:if="${success}" class="alert alert-success">
+                Спасибо! Ваше сообщение отправлено. Я свяжусь с вами в ближайшее время.
+            </div>
+
+            <!-- ФОРМА ОБРАТНОЙ СВЯЗИ
+                 th:action — URL куда отправляется форма (POST /contact)
+                 th:object — привязывает форму к объекту contactForm из Model
+                 method="post" — HTTP-метод -->
+            <form th:action="@{/contact}"
+                  th:object="${contactForm}"
+                  method="post"
+                  th:unless="${success}">
+
+                <!-- CSRF-токен — Spring Security автоматически добавляет его
+                     для защиты от подделки запросов. Thymeleaf делает это сам. -->
+
+                <div class="mb-3">
+                    <label class="form-label">Ваше имя</label>
+                    <!--
+                      th:field="*{name}" — привязывает поле к contactForm.name.
+                      Звёздочка (*) означает "поле текущего объекта (th:object)".
+                    -->
+                    <input type="text" class="form-control"
+                           th:field="*{name}"
+                           th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                           placeholder="Иван Иванов">
+                    <!-- Показывает ошибку валидации если поле неверно заполнено -->
+                    <div class="invalid-feedback" th:errors="*{name}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control"
+                           th:field="*{email}"
+                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'"
+                           placeholder="ivan@example.com">
+                    <div class="invalid-feedback" th:errors="*{email}"></div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Сообщение</label>
+                    <textarea class="form-control" rows="5"
+                              th:field="*{message}"
+                              th:classappend="${#fields.hasErrors('message')} ? 'is-invalid'"
+                              placeholder="Ваше сообщение..."></textarea>
+                    <div class="invalid-feedback" th:errors="*{message}"></div>
+                </div>
+
+                <button type="submit" class="btn btn-dark">Отправить</button>
+            </form>
+
+            <!-- Ссылки на соцсети -->
+            <hr class="my-4">
+            <h5>Соцсети</h5>
+            <div class="d-flex gap-3">
+                <a href="#" class="btn btn-outline-dark">Instagram</a>
+                <a href="#" class="btn btn-outline-dark">Facebook</a>
+                <a href="#" class="btn btn-outline-dark">Behance</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center"><p>© 2024 Портфолио художника</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

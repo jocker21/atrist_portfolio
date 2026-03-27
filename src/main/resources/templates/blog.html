@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Блог | Портфолио художника</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Портфолио</a>
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" th:href="@{/}">Главная</a>
+            <a class="nav-link" th:href="@{/gallery}">Галерея</a>
+            <a class="nav-link active" th:href="@{/blog}">Блог</a>
+            <a class="nav-link" th:href="@{/contact}">Контакты</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-5">
+    <h1 class="mb-4">Блог</h1>
+
+    <!-- Список статей.
+         postsPage — это объект Page<BlogPost> из Spring Data.
+         postsPage.content — список статей на текущей странице. -->
+    <div class="row g-4">
+        <div class="col-md-6" th:each="post : ${postsPage.content}">
+            <div class="card h-100 shadow-sm">
+                <img th:if="${post.coverImageUrl}"
+                     th:src="@{'/' + post.coverImageUrl}"
+                     class="card-img-top"
+                     style="height: 200px; object-fit: cover;"
+                     th:alt="${post.title}">
+                <div class="card-body">
+                    <h5 class="card-title" th:text="${post.title}">Заголовок</h5>
+                    <!-- #temporals — утилита Thymeleaf для форматирования дат -->
+                    <p class="text-muted small"
+                       th:text="${#temporals.format(post.publishedAt, 'dd MMMM yyyy')}">
+                    </p>
+                    <p class="card-text" th:text="${post.excerpt}">Краткое описание статьи</p>
+                    <a th:href="@{/blog/{slug}(slug=${post.slug})}"
+                       class="btn btn-sm btn-dark">
+                        Читать далее
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ПАГИНАЦИЯ -->
+    <!--
+      postsPage.totalPages — сколько страниц всего.
+      postsPage.number — текущая страница (0-based).
+    -->
+    <nav th:if="${postsPage.totalPages > 1}" class="mt-5">
+        <ul class="pagination justify-content-center">
+            <!-- Кнопка "Назад" -->
+            <li class="page-item" th:classappend="${postsPage.first} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/blog(page=${postsPage.number - 1})}">
+                    Назад
+                </a>
+            </li>
+            <!-- Номера страниц.
+                 #numbers.sequence(0, N) генерирует список [0, 1, 2, ..., N] -->
+            <li class="page-item"
+                th:each="i : ${#numbers.sequence(0, postsPage.totalPages - 1)}"
+                th:classappend="${i == postsPage.number} ? 'active'">
+                <a class="page-link"
+                   th:href="@{/blog(page=${i})}"
+                   th:text="${i + 1}">1</a>
+            </li>
+            <!-- Кнопка "Вперёд" -->
+            <li class="page-item" th:classappend="${postsPage.last} ? 'disabled'">
+                <a class="page-link"
+                   th:href="@{/blog(page=${postsPage.number + 1})}">
+                    Вперёд
+                </a>
+            </li>
+        </ul>
+    </nav>
+</main>
+
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center"><p>© 2024 Портфолио художника</p></div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

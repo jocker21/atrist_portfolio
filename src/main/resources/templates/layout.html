@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<!--
+  layout.html — базовый шаблон для всех страниц сайта.
+  Другие шаблоны "наследуют" его через Thymeleaf Layout Dialect.
+  
+  xmlns:th — пространство имён Thymeleaf (атрибуты th:*)
+-->
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- th:text — вставляет текст из переменной вместо содержимого тега -->
+    <title th:text="${pageTitle} + ' | Художник'">Художник</title>
+
+    <!-- SEO мета-теги -->
+    <meta name="description" th:content="${pageDescription ?: 'Портфолио художника'}">
+
+    <!-- Bootstrap CSS из CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- th:href — Thymeleaf генерирует корректный URL для статических файлов -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+
+<!-- НАВИГАЦИЯ -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/}">Имя Художника</a>
+
+        <div class="navbar-nav ms-auto">
+            <a class="nav-link" th:href="@{/}" th:classappend="${currentPage == 'home'} ? 'active'">
+                Главная
+            </a>
+            <a class="nav-link" th:href="@{/gallery}" th:classappend="${currentPage == 'gallery'} ? 'active'">
+                Галерея
+            </a>
+            <a class="nav-link" th:href="@{/blog}" th:classappend="${currentPage == 'blog'} ? 'active'">
+                Блог
+            </a>
+            <a class="nav-link" th:href="@{/contact}">Контакты</a>
+
+            <!--
+              sec:authorize — показывает элемент только если условие выполнено.
+              isAuthenticated() — пользователь вошёл в систему.
+            -->
+            <a class="nav-link" th:href="@{/admin/artworks}"
+               sec:authorize="isAuthenticated()">
+                Админ
+            </a>
+            <a class="nav-link" th:href="@{/logout}"
+               sec:authorize="isAuthenticated()">
+                Выйти
+            </a>
+        </div>
+    </div>
+</nav>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<!-- th:replace — вставляет содержимое конкретного шаблона сюда -->
+<main class="container my-4">
+    <!-- Это "слот" — каждый дочерний шаблон заполняет его своим содержимым -->
+    <div th:replace="${content}">
+        <!-- Placeholder — заменяется дочерним шаблоном -->
+    </div>
+</main>
+
+<!-- ФУТЕР -->
+<footer class="bg-dark text-light py-4 mt-5">
+    <div class="container text-center">
+        <p>© 2024 Имя Художника. Все права защищены.</p>
+        <div class="mt-2">
+            <a href="#" class="text-light me-3">Instagram</a>
+            <a href="#" class="text-light me-3">Facebook</a>
+            <a href="#" class="text-light">Behance</a>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/main.js}"></script>
+</body>
+</html>

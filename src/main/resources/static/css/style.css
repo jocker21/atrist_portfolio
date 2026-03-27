@@ -1,0 +1,27 @@
+/* style.css — основные стили сайта-портфолио */
+
+/* Плавный hover на карточках галереи */
+.artwork-card:hover img {
+    transform: scale(1.05);
+}
+
+/* Отступы для основного контента */
+main {
+    min-height: 60vh;
+}
+
+/* Стиль для изображений в галерее */
+.card-img-top {
+    transition: transform 0.3s ease;
+}
+
+/* Навигационные ссылки */
+.navbar-nav .nav-link.active {
+    font-weight: 500;
+}
+
+/* Улучшенный вид blockquote на главной */
+blockquote {
+    border-left: 4px solid #dee2e6;
+    padding-left: 1rem;
+}

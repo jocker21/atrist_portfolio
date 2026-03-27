@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Управление работами | Админ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">Админ-панель</span>
+        <div class="navbar-nav flex-row gap-3">
+            <a class="nav-link active" th:href="@{/admin/artworks}">Работы</a>
+            <a class="nav-link" th:href="@{/admin/blog}">Блог</a>
+            <a class="nav-link" th:href="@{/}">На сайт</a>
+            <a class="nav-link" th:href="@{/logout}">Выйти</a>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Работы</h1>
+        <a th:href="@{/admin/artworks/new}" class="btn btn-dark">
+            + Добавить работу
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Изображение</th>
+                <th>Название</th>
+                <th>Год</th>
+                <th>Техника</th>
+                <th>Опубликована</th>
+                <th>Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="artwork : ${artworks}">
+                <td style="width: 80px;">
+                    <img th:if="${artwork.imageUrl}"
+                         th:src="@{'/' + artwork.imageUrl}"
+                         style="width:60px; height:60px; object-fit:cover; border-radius:4px;"
+                         th:alt="${artwork.title}">
+                    <span th:unless="${artwork.imageUrl}" class="text-muted">—</span>
+                </td>
+                <td th:text="${artwork.title}">Название</td>
+                <td th:text="${artwork.year}">2024</td>
+                <td th:text="${artwork.technique ?: '—'}">Масло</td>
+                <td>
+                    <!-- Индикатор публикации -->
+                    <span th:if="${artwork.published}"
+                          class="badge bg-success">Да</span>
+                    <span th:unless="${artwork.published}"
+                          class="badge bg-secondary">Нет</span>
+                </td>
+                <td>
+                    <a th:href="@{/admin/artworks/{id}/edit(id=${artwork.id})}"
+                       class="btn btn-sm btn-outline-dark me-1">
+                        Изменить
+                    </a>
+                    <!--
+                      Удаление через POST — HTML не поддерживает DELETE.
+                      Форма с одной кнопкой — стандартный паттерн для Thymeleaf.
+                    -->
+                    <form th:action="@{/admin/artworks/{id}/delete(id=${artwork.id})}"
+                          method="post"
+                          style="display: inline;"
+                          onsubmit="return confirm('Удалить работу?')">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            Удалить
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            <!-- Строка если список пустой -->
+            <tr th:if="${#lists.isEmpty(artworks)}">
+                <td colspan="6" class="text-center text-muted py-4">
+                    Работ пока нет. <a th:href="@{/admin/artworks/new}">Добавить первую?</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
