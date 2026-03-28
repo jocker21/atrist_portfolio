@@ -27,7 +27,7 @@ public class AdminController {
     // GET /admin/artworks — список всех работ
     @GetMapping("/artworks")
     public String artworkList(Model model) {
-        model.addAttribute("artworks", artworkService.getAllPublished());
+        model.addAttribute("artworks", artworkService.getAll());
         return "admin/artworks";
     }
 

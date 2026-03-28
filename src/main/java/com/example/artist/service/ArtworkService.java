@@ -38,6 +38,11 @@ public class ArtworkService {
         return artworkRepository.findByPublishedTrue();
     }
 
+    // Всі картини для адмінки (включно з неопублікованими)
+    public List<Artwork> getAll() {
+        return artworkRepository.findAll();
+    }
+
     // Получить работы по категории
     public List<Artwork> getByCategory(String categorySlug) {
         return artworkRepository.findByCategoriesSlugAndPublishedTrue(categorySlug);

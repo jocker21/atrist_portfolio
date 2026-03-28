@@ -7,8 +7,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-// CommandLineRunner — Spring запускает метод run() сразу после старта приложения.
-// Используем чтобы создать пользователей если их ещё нет в БД.
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
@@ -18,23 +16,19 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-
-        createUserIfNotExists("artist", "user_root");
-        createUserIfNotExists("admin", "admin_admin");
-        createUserIfNotExists("user", "user_user");
+        createUserIfNotExists("admin", "admin_admin", "ROLE_ADMIN");
+        createUserIfNotExists("user", "user_user", "ROLE_USER");
     }
 
-    private void createUserIfNotExists(String username, String rawPassword) {
-        // Проверяем что пользователь ещё не существует
-        // чтобы не создавать дубликаты при каждом перезапуске
+    private void createUserIfNotExists(String username, String rawPassword, String role) {
         if (userRepository.findByUsername(username).isEmpty()) {
             User user = new User();
             user.setUsername(username);
             user.setPassword(passwordEncoder.encode(rawPassword));
-            user.setRole("ROLE_ADMIN");
+            user.setRole(role);
             user.setEnabled(true);
             userRepository.save(user);
-            System.out.println("Создан пользователь: " + username);
+            System.out.println("Створено користувача: " + username + " з роллю: " + role);
         }
     }
 }
