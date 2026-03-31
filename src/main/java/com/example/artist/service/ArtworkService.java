@@ -53,17 +53,13 @@ public class ArtworkService {
                 .orElseThrow(() -> new RuntimeException("Картину не знайдено: " + id));
     }
 
-    // Зберегти картину з файлом і категоріями
     public Artwork save(Artwork artwork, MultipartFile imageFile, List<Long> categoryIds) throws IOException {
-
-        // Зберігаємо зображення якщо передано
         if (imageFile != null && !imageFile.isEmpty()) {
             validateImageFile(imageFile);
             String imagePath = saveImage(imageFile);
             artwork.setImageUrl(imagePath);
         }
 
-        // Прив'язуємо категорії
         if (categoryIds != null && !categoryIds.isEmpty()) {
             Set<Category> categories = new HashSet<>(categoryRepository.findAllById(categoryIds));
             artwork.setCategories(categories);
@@ -78,7 +74,6 @@ public class ArtworkService {
         artworkRepository.deleteById(id);
     }
 
-    // Перевірка що файл є зображенням
     private void validateImageFile(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType == null || !contentType.startsWith("image/")) {

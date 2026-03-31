@@ -19,22 +19,17 @@ public class OrderController {
     private final OrderService orderService;
     private final ArtworkService artworkService;
 
-    // GET /order/{id} — форма замовлення для конкретної картини
     @GetMapping("/{id}")
     public String orderForm(@PathVariable Long id, Model model) {
         Artwork artwork = artworkService.getById(id);
-
-        // Якщо картина вже продана — повертаємо назад
         if (!artwork.isAvailable()) {
             return "redirect:/gallery/" + id;
         }
-
         model.addAttribute("artwork", artwork);
         model.addAttribute("order", new Order());
         return "order";
     }
 
-    // POST /order/{id} — обробка форми
     @PostMapping("/{id}")
     public String submitOrder(
             @PathVariable Long id,
@@ -47,16 +42,13 @@ public class OrderController {
             return "order";
         }
 
-        // Прив'язуємо картину до замовлення
         Artwork artwork = artworkService.getById(id);
         order.setArtwork(artwork);
-
         orderService.save(order);
 
         return "redirect:/order/success";
     }
 
-    // Сторінка успішного замовлення
     @GetMapping("/success")
     public String success() {
         return "order-success";

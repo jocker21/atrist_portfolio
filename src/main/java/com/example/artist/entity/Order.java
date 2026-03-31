@@ -1,4 +1,3 @@
-
 package com.example.artist.entity;
 
 import jakarta.persistence.*;
@@ -21,32 +20,25 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Ім'я покупця
     @NotBlank(message = "Ім'я обов'язкове")
     private String customerName;
 
-    // Email для підтвердження
     @Email(message = "Невірний формат email")
     @NotBlank(message = "Email обов'язковий")
     private String customerEmail;
 
-    // Телефон для зв'язку
     private String customerPhone;
 
-    // Повідомлення від покупця
     @Column(columnDefinition = "TEXT")
     private String message;
 
-    // Картина яку замовляють
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "artwork_id", nullable = false)
     private Artwork artwork;
 
-    // Статус замовлення
     @Enumerated(EnumType.STRING)
     private OrderStatus status = OrderStatus.NEW;
 
-    // Дата замовлення
     private LocalDateTime createdAt;
 
     @PrePersist
@@ -55,9 +47,9 @@ public class Order {
     }
 
     public enum OrderStatus {
-        NEW,        // нове, ще не переглянуте
-        SEEN,       // художник переглянув
-        CONFIRMED,  // підтверджено
-        CANCELLED   // скасовано
+        NEW,
+        SEEN,
+        CONFIRMED,
+        CANCELLED
     }
 }
