@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Форма работы | Админ</title>
+    <title>Форма картини | Адмін</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 
 <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-        <a class="navbar-brand" th:href="@{/admin/artworks}">← Назад к работам</a>
+        <a class="navbar-brand" th:href="@{/admin/artworks}">← Назад до картин</a>
     </div>
 </nav>
 
@@ -17,15 +17,9 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
 
-            <!-- th:text с тернарным оператором: если у работы есть id — это редактирование -->
-            <h1 th:text="${artwork.id != null} ? 'Редактировать работу' : 'Новая работа'"
-                class="mb-4">
-            </h1>
+            <h1 th:text="${artwork.id != null} ? 'Редагувати картину' : 'Нова картина'"
+                class="mb-4"></h1>
 
-            <!--
-              enctype="multipart/form-data" — обязательно для загрузки файлов!
-              Без него файл не передастся на сервер.
-            -->
             <form th:action="${artwork.id != null}
                               ? @{/admin/artworks/{id}/edit(id=${artwork.id})}
                               : @{/admin/artworks/new}"
@@ -33,18 +27,20 @@
                   method="post"
                   enctype="multipart/form-data">
 
+                <!-- Назва -->
                 <div class="mb-3">
-                    <label class="form-label">Название <span class="text-danger">*</span></label>
+                    <label class="form-label">Назва <span class="text-danger">*</span></label>
                     <input type="text" class="form-control"
                            th:field="*{title}"
                            th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
-                           placeholder="Название работы">
+                           placeholder="Назва роботи">
                     <div class="invalid-feedback" th:errors="*{title}"></div>
                 </div>
 
+                <!-- Рік + Ціна -->
                 <div class="row">
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Год <span class="text-danger">*</span></label>
+                        <label class="form-label">Рік <span class="text-danger">*</span></label>
                         <input type="number" class="form-control"
                                th:field="*{year}"
                                th:classappend="${#fields.hasErrors('year')} ? 'is-invalid'"
@@ -52,36 +48,89 @@
                         <div class="invalid-feedback" th:errors="*{year}"></div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Техника</label>
-                        <input type="text" class="form-control"
-                               th:field="*{technique}"
-                               placeholder="Масло, акварель...">
+                        <label class="form-label">Ціна (грн)</label>
+                        <input type="number" class="form-control"
+                               th:field="*{price}"
+                               th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'"
+                               min="0" step="0.01"
+                               placeholder="0.00">
+                        <div class="invalid-feedback" th:errors="*{price}"></div>
                     </div>
                     <div class="col-md-4 mb-3">
-                        <label class="form-label">Размеры</label>
-                        <input type="text" class="form-control"
-                               th:field="*{dimensions}"
-                               placeholder="60×80 см">
+                        <label class="form-label">Жанр</label>
+                        <select class="form-select" th:field="*{genre}">
+                            <option value="">— оберіть —</option>
+                            <option value="Портрет">Портрет</option>
+                            <option value="Пейзаж">Пейзаж</option>
+                            <option value="Натюрморт">Натюрморт</option>
+                            <option value="Абстракція">Абстракція</option>
+                            <option value="Анімалістика">Анімалістика</option>
+                            <option value="Міський пейзаж">Міський пейзаж</option>
+                            <option value="Морський пейзаж">Морський пейзаж</option>
+                            <option value="Інше">Інше</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Описание</label>
-                    <textarea class="form-control" rows="4"
-                              th:field="*{description}"
-                              placeholder="Описание работы, история создания..."></textarea>
+                <!-- Матеріал + Основа -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Матеріал</label>
+                        <select class="form-select" th:field="*{material}">
+                            <option value="">— оберіть —</option>
+                            <option value="Олія">Олія</option>
+                            <option value="Акварель">Акварель</option>
+                            <option value="Акрил">Акрил</option>
+                            <option value="Пастель">Пастель</option>
+                            <option value="Графіт">Графіт</option>
+                            <option value="Вугілля">Вугілля</option>
+                            <option value="Темпера">Темпера</option>
+                            <option value="Змішана техніка">Змішана техніка</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Основа</label>
+                        <select class="form-select" th:field="*{surface}">
+                            <option value="">— оберіть —</option>
+                            <option value="Полотно">Полотно</option>
+                            <option value="Папір">Папір</option>
+                            <option value="Картон">Картон</option>
+                            <option value="Дерево">Дерево</option>
+                            <option value="ДВП">ДВП</option>
+                            <option value="Оргаліт">Оргаліт</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Категории — чекбоксы -->
+                <!-- Розміри -->
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Ширина (см)</label>
+                        <input type="number" class="form-control"
+                               th:field="*{widthCm}"
+                               min="1" placeholder="60">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Висота (см)</label>
+                        <input type="number" class="form-control"
+                               th:field="*{heightCm}"
+                               min="1" placeholder="80">
+                    </div>
+                </div>
+
+                <!-- Опис -->
                 <div class="mb-3">
-                    <label class="form-label">Категории</label>
+                    <label class="form-label">Опис</label>
+                    <textarea class="form-control" rows="4"
+                              th:field="*{description}"
+                              placeholder="Опис роботи, історія створення..."></textarea>
+                </div>
+
+                <!-- Категорії -->
+                <div class="mb-3">
+                    <label class="form-label">Категорії</label>
                     <div class="d-flex flex-wrap gap-2">
                         <div th:each="cat : ${categories}" class="form-check">
-                            <!--
-                              th:value — значение чекбокса = id категории
-                              th:checked — отмечен если artwork.categories содержит эту категорию
-                              name="categories" — Spring соберёт все отмеченные в список
-                            -->
                             <input class="form-check-input" type="checkbox"
                                    name="categoryIds"
                                    th:value="${cat.id}"
@@ -91,38 +140,47 @@
                     </div>
                 </div>
 
-                <!-- Загрузка изображения -->
+                <!-- Зображення -->
                 <div class="mb-3">
-                    <label class="form-label">Изображение</label>
-                    <!-- Показываем текущее изображение если оно есть -->
+                    <label class="form-label">Зображення</label>
                     <div th:if="${artwork.imageUrl}" class="mb-2">
                         <img th:src="@{'/' + artwork.imageUrl}"
                              style="max-height: 150px; border-radius: 4px;"
-                             alt="Текущее изображение">
-                        <p class="text-muted small mt-1">Загрузите новое изображение чтобы заменить</p>
+                             alt="Поточне зображення">
+                        <p class="text-muted small mt-1">Завантажте нове зображення щоб замінити</p>
                     </div>
-                    <!--
-                      type="file" с name="imageFile" — Spring MVC получит его
-                      как MultipartFile imageFile в контроллере
-                    -->
                     <input type="file" class="form-control"
                            name="imageFile"
                            accept="image/*">
                 </div>
 
-                <!-- Чекбокс публикации -->
-                <div class="mb-4 form-check">
-                    <input type="checkbox" class="form-check-input"
-                           th:field="*{published}" id="published">
-                    <label class="form-check-label" for="published">
-                        Опубликовать в галерее
-                    </label>
+                <!-- Доступна + Опублікована -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input"
+                                   th:field="*{available}" id="available">
+                            <label class="form-check-label" for="available">
+                                Доступна для продажу
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input"
+                                   th:field="*{published}" id="published">
+                            <label class="form-check-label" for="published">
+                                Опублікувати в галереї
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-dark">Сохранить</button>
-                    <a th:href="@{/admin/artworks}" class="btn btn-outline-secondary">Отмена</a>
+                    <button type="submit" class="btn btn-dark">Зберегти</button>
+                    <a th:href="@{/admin/artworks}" class="btn btn-outline-secondary">Скасувати</a>
                 </div>
+
             </form>
         </div>
     </div>
