@@ -73,8 +73,8 @@
                         <p class="card-text text-muted">
                             <small th:text="${artwork.year}">2024</small>
                             <!-- th:if + th:text — показываем технику если она задана -->
-                            <span th:if="${artwork.technique}"
-                                  th:text="' · ' + ${artwork.technique}"></span>
+                            <span th:if="${artwork.material}"
+                                  th:text="' · ' + ${artwork.material}"></span>
                         </p>
                         <!-- @{/gallery/{id}(id=${artwork.id})} — URL с параметром -->
                         <a th:href="@{/gallery/{id}(id=${artwork.id})}"
