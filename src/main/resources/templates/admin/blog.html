@@ -1,71 +1,69 @@
-<!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Блог | Админ</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-        <span class="navbar-brand">Админ-панель</span>
-        <div class="navbar-nav flex-row gap-3">
-            <a class="nav-link" th:href="@{/admin/artworks}">Работы</a>
-            <a class="nav-link active" th:href="@{/admin/blog}">Блог</a>
-            <a class="nav-link" th:href="@{/}">На сайт</a>
-            <th:block th:replace="~{fragments/logout :: button}"></th:block>
-        </div>
-    </div>
-</nav>
-
-<main class="container my-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Статьи блога</h1>
-        <a th:href="@{/admin/blog/new}" class="btn btn-dark">+ Новая статья</a>
-    </div>
-
-    <table class="table table-hover align-middle">
-        <thead class="table-dark">
-        <tr>
-            <th>Заголовок</th>
-            <th>Slug</th>
-            <th>Опубликована</th>
-            <th>Дата</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="post : ${posts}">
-            <td th:text="${post.title}">Заголовок</td>
-            <td><code th:text="${post.slug}">slug</code></td>
-            <td>
-                <span th:if="${post.published}" class="badge bg-success">Да</span>
-                <span th:unless="${post.published}" class="badge bg-secondary">Черновик</span>
-            </td>
-            <td th:text="${post.publishedAt != null}
-                         ? ${#temporals.format(post.publishedAt, 'dd.MM.yyyy')}
-                         : '—'">
-            </td>
-            <td>
-                <a th:href="@{/admin/blog/{id}/edit(id=${post.id})}"
-                   class="btn btn-sm btn-outline-dark me-1">Изменить</a>
-                <form th:action="@{/admin/blog/{id}/delete(id=${post.id})}"
-                      method="post" style="display:inline;"
-                      onsubmit="return confirm('Удалить статью?')">
-                    <button type="submit" class="btn btn-sm btn-outline-danger">Удалить</button>
-                </form>
-            </td>
-        </tr>
-        <tr th:if="${#lists.isEmpty(posts)}">
-            <td colspan="5" class="text-center text-muted py-4">
-                Статей пока нет. <a th:href="@{/admin/blog/new}">Написать первую?</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{admin.posts})}"></head>
+  <body class="admin-page">
+    <nav th:replace="~{fragments/site :: adminHeader}"></nav>
+    <main class="container my-5">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 th:text="#{admin.posts}"></h1>
+        <a
+          class="btn btn-dark"
+          th:href="@{/admin/blog/new}"
+          th:text="#{admin.newPost}"
+        ></a>
+      </div>
+      <div class="table-responsive">
+        <table class="table align-middle table-hover">
+          <thead>
+            <tr>
+              <th th:text="#{field.title}"></th>
+              <th th:text="#{admin.slug}"></th>
+              <th th:text="#{field.published}"></th>
+              <th th:text="#{field.date}"></th>
+              <th th:text="#{field.actions}"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="post : ${posts}">
+              <td th:text="${@portfolioText.title(post,#locale)}"></td>
+              <td><code th:text="${post.slug}"></code></td>
+              <td
+                th:text="${post.published} ? #{admin.yes} : #{admin.draft}"
+              ></td>
+              <td
+                th:text="${post.publishedAt != null ? #temporals.format(post.publishedAt,'dd.MM.yyyy') : '—'}"
+              ></td>
+              <td>
+                <div class="d-flex gap-2">
+                  <a
+                    class="btn btn-sm btn-outline-dark"
+                    th:href="@{/admin/blog/{id}/edit(id=${post.id})}"
+                    th:text="#{action.edit}"
+                  ></a>
+                  <form
+                    method="post"
+                    th:action="@{/admin/blog/{id}/delete(id=${post.id})}"
+                    th:attr="data-confirm=#{confirm.post}"
+                  >
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      type="submit"
+                      th:text="#{action.delete}"
+                    ></button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(posts)}">
+              <td
+                colspan="5"
+                class="text-muted py-4"
+                th:text="#{admin.emptyPosts}"
+              ></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </body>
 </html>

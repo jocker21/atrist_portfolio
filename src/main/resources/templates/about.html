@@ -1,0 +1,55 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{nav.about})}"></head>
+  <body>
+    <header th:replace="~{fragments/site :: header('about')}"></header>
+    <main class="site-container section-space">
+      <p class="eyebrow section-number" th:text="#{nav.about}"></p>
+      <div class="about-layout">
+        <figure class="artist-visual">
+          <img
+            th:if="${!#strings.isEmpty(artistProfile.portraitUrl)}"
+            th:src="@{'/' + ${artistProfile.portraitUrl}}"
+            th:alt="${@artistProfileService.name(artistProfile,#locale)}"
+            class="artist-portrait"
+          />
+          <img
+            th:if="${#strings.isEmpty(artistProfile.portraitUrl)}"
+            th:src="@{/images/studio-hero-yachts.png}"
+            th:alt="#{about.studioImage}"
+            class="artist-studio"
+          />
+          <figcaption
+            th:if="${#strings.isEmpty(artistProfile.portraitUrl)}"
+            th:text="#{about.studioImage}"
+          ></figcaption>
+        </figure>
+        <article class="artist-biography">
+          <h1
+            th:text="${@artistProfileService.name(artistProfile,#locale)}"
+          ></h1>
+          <p
+            class="artist-intro"
+            th:text="${@artistProfileService.intro(artistProfile,#locale)}"
+          ></p>
+          <div
+            class="biography-text"
+            th:text="${@artistProfileService.biography(artistProfile,#locale)}"
+          ></div>
+          <div class="about-actions">
+            <a class="button button-accent" th:href="@{/gallery}"
+              ><span th:text="#{hero.explore}"></span
+              ><span aria-hidden="true">→</span></a
+            >
+            <a
+              class="text-link"
+              th:href="@{/contact}"
+              th:text="#{footer.contact}"
+            ></a>
+          </div>
+        </article>
+      </div>
+    </main>
+    <footer th:replace="~{fragments/site :: footer}"></footer>
+  </body>
+</html>

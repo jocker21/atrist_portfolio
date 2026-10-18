@@ -1,0 +1,191 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{profile.title})}"></head>
+  <body class="admin-page">
+    <nav th:replace="~{fragments/site :: adminHeader}"></nav>
+    <main class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-9">
+          <div class="profile-heading">
+            <h1 th:text="#{profile.title}"></h1>
+            <a
+              class="text-link"
+              th:href="@{/about}"
+              th:text="#{profile.view}"
+            ></a>
+          </div>
+          <div
+            th:if="${profileSaved}"
+            class="alert alert-success"
+            role="status"
+            th:text="#{profile.saved}"
+          ></div>
+          <form
+            th:action="@{/admin/profile}"
+            th:object="${profileForm}"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <div class="row g-4">
+              <section class="col-md-6">
+                <h2 lang="uk">Українська</h2>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="nameUk"
+                    th:text="#{profile.nameUk}"
+                  ></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nameUk"
+                    th:field="*{nameUk}"
+                    th:classappend="${#fields.hasErrors('nameUk')} ? 'is-invalid'"
+                    required
+                    maxlength="80"
+                  />
+                  <div class="invalid-feedback" th:errors="*{nameUk}"></div>
+                </div>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="introUk"
+                    th:text="#{profile.introUk}"
+                  ></label>
+                  <textarea
+                    rows="8"
+                    class="form-control"
+                    id="introUk"
+                    th:field="*{introUk}"
+                    th:classappend="${#fields.hasErrors('introUk')} ? 'is-invalid'"
+                    maxlength="800"
+                  ></textarea>
+                  <div class="invalid-feedback" th:errors="*{introUk}"></div>
+                </div>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="biographyUk"
+                    th:text="#{profile.biographyUk}"
+                  ></label>
+                  <textarea
+                    rows="8"
+                    class="form-control"
+                    id="biographyUk"
+                    th:field="*{biographyUk}"
+                    th:classappend="${#fields.hasErrors('biographyUk')} ? 'is-invalid'"
+                    maxlength="12000"
+                  ></textarea>
+                  <div
+                    class="invalid-feedback"
+                    th:errors="*{biographyUk}"
+                  ></div>
+                </div>
+              </section>
+              <section class="col-md-6">
+                <h2 lang="en">English</h2>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="nameEn"
+                    th:text="#{profile.nameEn}"
+                  ></label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="nameEn"
+                    th:field="*{nameEn}"
+                    th:classappend="${#fields.hasErrors('nameEn')} ? 'is-invalid'"
+                    required
+                    maxlength="80"
+                  />
+                  <div class="invalid-feedback" th:errors="*{nameEn}"></div>
+                </div>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="introEn"
+                    th:text="#{profile.introEn}"
+                  ></label>
+                  <textarea
+                    rows="8"
+                    class="form-control"
+                    id="introEn"
+                    th:field="*{introEn}"
+                    th:classappend="${#fields.hasErrors('introEn')} ? 'is-invalid'"
+                    maxlength="800"
+                  ></textarea>
+                  <div class="invalid-feedback" th:errors="*{introEn}"></div>
+                </div>
+                <div class="mb-4">
+                  <label
+                    class="form-label"
+                    for="biographyEn"
+                    th:text="#{profile.biographyEn}"
+                  ></label>
+                  <textarea
+                    rows="8"
+                    class="form-control"
+                    id="biographyEn"
+                    th:field="*{biographyEn}"
+                    th:classappend="${#fields.hasErrors('biographyEn')} ? 'is-invalid'"
+                    maxlength="12000"
+                  ></textarea>
+                  <div
+                    class="invalid-feedback"
+                    th:errors="*{biographyEn}"
+                  ></div>
+                </div>
+              </section>
+            </div>
+            <section class="translation-fields">
+              <h2 th:text="#{profile.portrait}"></h2>
+              <img
+                th:if="${artistProfile.portraitUrl != null}"
+                th:src="@{'/' + ${artistProfile.portraitUrl}}"
+                th:alt="${@artistProfileService.name(artistProfile,#locale)}"
+                class="profile-current-photo"
+              />
+              <label
+                for="portrait"
+                class="form-label"
+                th:text="#{profile.choosePortrait}"
+              ></label>
+              <input
+                class="form-control"
+                type="file"
+                name="portrait"
+                id="portrait"
+                accept="image/png,image/jpeg"
+                aria-describedby="portrait-help"
+              />
+              <p
+                id="portrait-help"
+                class="form-text"
+                th:text="#{profile.portraitFormats}"
+              ></p>
+              <div
+                th:if="${portraitError}"
+                class="alert alert-danger"
+                role="alert"
+                th:text="${#messages.msg(portraitError)}"
+              ></div>
+            </section>
+            <div class="form-actions">
+              <button
+                type="submit"
+                class="button button-accent"
+                th:text="#{action.save}"
+              ></button
+              ><a
+                th:href="@{/admin/artworks}"
+                class="text-link"
+                th:text="#{action.cancel}"
+              ></a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

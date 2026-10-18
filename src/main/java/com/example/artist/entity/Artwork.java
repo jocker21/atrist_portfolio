@@ -24,14 +24,19 @@ public class Artwork {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Назва обов'язкова")
+    @NotBlank(message = "{validation.title}")
     @Column(nullable = false)
     private String title;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    @NotNull(message = "Рік створення обов'язковий")
+    private String titleEn;
+
+    @Column(columnDefinition = "TEXT")
+    private String descriptionEn;
+
+    @NotNull(message = "{validation.year}")
     @Column(nullable = false)
     private Integer year;
 
@@ -42,7 +47,7 @@ public class Artwork {
     private Integer widthCm;
     private Integer heightCm;
 
-    @Positive(message = "Ціна має бути більше нуля")
+    @Positive(message = "{validation.price}")
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
 

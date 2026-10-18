@@ -62,14 +62,14 @@ public class ContactController {
     @Data // Lombok: генерирует getters, setters, toString
     public static class ContactForm {
 
-        @NotBlank(message = "Введите ваше имя")
+        @NotBlank(message = "{validation.name}")
         private String name;
 
-        @NotBlank(message = "Введите email")
-        @Email(message = "Некорректный email")
+        @NotBlank(message = "{validation.email}")
+        @Email(message = "{validation.emailInvalid}")
         private String email;
 
-        @NotBlank(message = "Введите сообщение")
+        @NotBlank(message = "{validation.message}")
         private String message;
     }
 }

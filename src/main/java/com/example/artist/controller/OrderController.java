@@ -67,11 +67,11 @@ public class OrderController {
 
     @Data
     public static class OrderForm {
-        @NotBlank(message = "Ім'я обов'язкове")
+        @NotBlank(message = "{validation.name}")
         private String customerName;
 
-        @Email(message = "Невірний формат email")
-        @NotBlank(message = "Email обов'язковий")
+        @Email(message = "{validation.emailInvalid}")
+        @NotBlank(message = "{validation.email}")
         private String customerEmail;
 
         private String customerPhone;

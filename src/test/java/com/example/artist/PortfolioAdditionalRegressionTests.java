@@ -63,7 +63,7 @@ class PortfolioAdditionalRegressionTests {
         long count = messages.count();
         mvc.perform(post("/contact").with(csrf()).param("name", "Customer")
                 .param("email", "test@example.com").param("message", "Question about painting"))
-                .andExpect(status().isOk()).andExpect(content().string(containsString("Ваше сообщение сохранено")));
+                .andExpect(status().isOk()).andExpect(content().string(containsString("Ваше повідомлення збережено")));
         assertThat(messages.count()).isEqualTo(count + 1);
         assertThat(messages.findAll().getLast().getMessage()).isEqualTo("Question about painting");
         mvc.perform(post("/contact").with(csrf()).param("name", "").param("email", "bad")

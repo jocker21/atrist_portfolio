@@ -1,51 +1,34 @@
-<!DOCTYPE html>
-<html lang="uk" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title th:text="${post.title + ' | Блог'}">Стаття</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/style.css}" rel="stylesheet">
-</head>
-<body>
-
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/}">Портфоліо</a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link" th:href="@{/}">Головна</a>
-            <a class="nav-link" th:href="@{/gallery}">Галерея</a>
-            <a class="nav-link active" th:href="@{/blog}">Блог</a>
-            <a class="nav-link" th:href="@{/contact}">Контакти</a>
-            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
-        </div>
-    </div>
-</nav>
-
-<main class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-
-            <img th:if="${post.coverImageUrl}"
-                 th:src="@{'/' + ${post.coverImageUrl}}"
-                 class="img-fluid rounded mb-4"
-                 th:alt="${post.title}"/>
-
-            <h1 class="mb-2" th:text="${post.title}">Заголовок</h1>
-
-            <p class="text-muted mb-4"
-               th:text="${#temporals.format(post.publishedAt, 'dd MMMM yyyy')}"></p>
-
-            <div th:utext="${post.content}">Текст статті</div>
-
-            <hr class="my-4">
-            <a th:href="@{/blog}" class="btn btn-outline-dark">← Назад до блогу</a>
-        </div>
-    </div>
-</main>
-
-<footer class="bg-dark text-light py-4 mt-5">
-    <div class="container text-center"><p>© 2024 Портфоліо художника</p></div>
-</footer>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head
+    th:replace="~{fragments/site :: head(${@portfolioText.title(post,#locale)})}"
+  ></head>
+  <body>
+    <header th:replace="~{fragments/site :: header('blog')}"></header>
+    <main class="site-container section-space">
+      <article class="post-body">
+        <a
+          class="text-link back-link"
+          th:href="@{/blog}"
+          th:text="#{action.blog}"
+        ></a>
+        <p
+          class="eyebrow section-number"
+          th:text="${#temporals.format(post.publishedAt,'dd MMMM yyyy')}"
+        ></p>
+        <h1 th:text="${@portfolioText.title(post,#locale)}"></h1>
+        <img
+          th:if="${!#strings.isEmpty(post.coverImageUrl)}"
+          class="post-cover"
+          th:src="@{'/' + ${post.coverImageUrl}}"
+          th:alt="${@portfolioText.title(post,#locale)}"
+        />
+        <div
+          class="post-content"
+          th:utext="${@portfolioText.content(post,#locale)}"
+        ></div>
+      </article>
+    </main>
+    <footer th:replace="~{fragments/site :: footer}"></footer>
+  </body>
 </html>

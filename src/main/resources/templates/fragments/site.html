@@ -1,0 +1,151 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head th:fragment="head(title)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title
+      th:text="${title + ' | ' + @artistProfileService.name(artistProfile,#locale)}"
+    >
+      Portfolio
+    </title>
+    <meta name="description" th:content="#{site.description}" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <script th:src="@{/js/site.js}" defer></script>
+  </head>
+  <body>
+    <header th:fragment="header(active)" class="site-header">
+      <div class="site-container header-inner">
+        <a class="wordmark" th:href="@{/}"
+          ><span
+            th:text="${@artistProfileService.name(artistProfile,#locale)}"
+          ></span
+          ><small th:text="#{brand.caption}"></small
+        ></a>
+        <nav class="site-nav" th:aria-label="#{nav.main}">
+          <a
+            th:href="@{/}"
+            th:classappend="${active == 'home'} ? 'active'"
+            th:text="#{nav.home}"
+          ></a>
+          <a
+            th:href="@{/gallery}"
+            th:classappend="${active == 'gallery'} ? 'active'"
+            th:text="#{nav.gallery}"
+          ></a>
+          <a
+            th:href="@{/about}"
+            th:classappend="${active == 'about'} ? 'active'"
+            th:text="#{nav.about}"
+          ></a>
+          <a
+            th:href="@{/blog}"
+            th:classappend="${active == 'blog'} ? 'active'"
+            th:text="#{nav.blog}"
+          ></a>
+          <a
+            th:href="@{/contact}"
+            th:classappend="${active == 'contact'} ? 'active'"
+            th:text="#{nav.contact}"
+          ></a>
+        </nav>
+        <div class="header-tools">
+          <nav class="language-switch" th:aria-label="#{language}">
+            <a
+              th:href="${languageUkUrl}"
+              lang="uk"
+              th:classappend="${#locale.language == 'uk'} ? 'active'"
+              th:attr="aria-current=${#locale.language == 'uk'} ? 'true' : null"
+              >УКР</a
+            ><span aria-hidden="true">/</span>
+            <a
+              th:href="${languageEnUrl}"
+              lang="en"
+              th:classappend="${#locale.language == 'en'} ? 'active'"
+              th:attr="aria-current=${#locale.language == 'en'} ? 'true' : null"
+              >EN</a
+            >
+          </nav>
+          <div class="account-links">
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
+          </div>
+        </div>
+      </div>
+    </header>
+    <nav th:fragment="adminHeader" class="admin-header">
+      <div class="site-container admin-header-inner">
+        <a
+          th:href="@{/admin/artworks}"
+          class="admin-brand"
+          th:text="#{nav.admin}"
+        ></a>
+        <a th:href="@{/admin/artworks}" th:text="#{admin.artworks}"></a
+        ><a th:href="@{/admin/blog}" th:text="#{nav.blog}"></a>
+        <a th:href="@{/admin/profile}" th:text="#{nav.about}"></a>
+        <a th:href="@{/admin/orders}" th:text="#{admin.orders}"></a
+        ><a th:href="@{/}" th:text="#{nav.site}"></a>
+        <nav class="language-switch" th:aria-label="#{language}">
+          <a
+            th:href="${languageUkUrl}"
+            lang="uk"
+            th:classappend="${#locale.language == 'uk'} ? 'active'"
+            >УКР</a
+          ><a
+            th:href="${languageEnUrl}"
+            lang="en"
+            th:classappend="${#locale.language == 'en'} ? 'active'"
+            >EN</a
+          >
+        </nav>
+        <th:block th:replace="~{fragments/logout :: button}"></th:block>
+      </div>
+    </nav>
+    <footer th:fragment="footer" class="site-footer">
+      <div class="site-container footer-inner">
+        <a
+          th:if="${hideFooterBrand != true}"
+          th:href="@{/}"
+          class="wordmark"
+          th:text="${@artistProfileService.name(artistProfile,#locale)}"
+        ></a>
+        <p
+          th:text="${'© ' + #temporals.year(#temporals.createToday()) + ' · ' + #messages.msg('footer.rights')}"
+        ></p>
+        <a th:href="@{/contact}" th:text="#{footer.contact}"></a>
+      </div>
+    </footer>
+    <article th:fragment="artworkCard(artwork)" class="work-card">
+      <a class="work-image" th:href="@{/gallery/{id}(id=${artwork.id})}">
+        <img
+          th:if="${!#strings.isEmpty(artwork.imageUrl)}"
+          th:src="@{'/' + ${artwork.imageUrl}}"
+          th:alt="${@portfolioText.title(artwork,#locale)}"
+          loading="lazy" />
+        <span
+          th:unless="${!#strings.isEmpty(artwork.imageUrl)}"
+          class="image-missing"
+          th:text="#{image.none}"
+        ></span
+      ></a>
+      <div class="work-meta">
+        <span th:text="${artwork.year}"></span
+        ><span
+          th:text="${@portfolioText.term(artwork.material,#locale)}"
+        ></span>
+      </div>
+      <h3>
+        <a
+          th:href="@{/gallery/{id}(id=${artwork.id})}"
+          th:text="${@portfolioText.title(artwork,#locale)}"
+        ></a>
+      </h3>
+      <a class="text-link" th:href="@{/gallery/{id}(id=${artwork.id})}"
+        ><span th:text="#{action.details}"></span
+        ><span aria-hidden="true">↗</span></a
+      >
+    </article>
+  </body>
+</html>

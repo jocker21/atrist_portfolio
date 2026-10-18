@@ -31,7 +31,7 @@ class LoginNavigationTests {
 
     @Test
     void loginIsVisibleAndAdministratorCanEnterAndLeavePanel() throws Exception {
-        for (String url : List.of("/", "/gallery", "/blog", "/contact", "/order/success")) {
+        for (String url : List.of("/", "/gallery", "/about", "/blog", "/contact", "/order/success")) {
             mvc.perform(get(url)).andExpect(status().isOk())
                     .andExpect(content().string(containsString("href=\"/login\"")))
                     .andExpect(content().string(not(containsString("href=\"/admin/artworks\""))));

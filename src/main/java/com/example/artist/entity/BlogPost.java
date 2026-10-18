@@ -20,7 +20,7 @@ public class BlogPost {
     private Long id;
 
     // Заголовок статьи
-    @NotBlank(message = "Заголовок обязателен")
+    @NotBlank(message = "{validation.title}")
     @Column(nullable = false)
     private String title;
 
@@ -33,9 +33,17 @@ public class BlogPost {
     private String excerpt;
 
     // Полный текст статьи (может быть очень длинным)
-    @NotBlank(message = "Текст статьи обязателен")
+    @NotBlank(message = "{validation.content}")
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
+
+    private String titleEn;
+
+    @Column(columnDefinition = "TEXT")
+    private String excerptEn;
+
+    @Column(columnDefinition = "TEXT")
+    private String contentEn;
 
     // Обложка статьи
     private String coverImageUrl;

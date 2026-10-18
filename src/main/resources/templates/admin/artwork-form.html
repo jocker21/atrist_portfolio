@@ -1,191 +1,378 @@
-<!DOCTYPE html>
-<html lang="uk" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>Форма картини | Адмін</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-
-<nav class="navbar navbar-dark bg-dark">
-    <div class="container">
-        <a class="navbar-brand" th:href="@{/admin/artworks}">← Назад до картин</a>
-    </div>
-</nav>
-
-<main class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-
-            <h1 th:text="${artwork.id != null} ? 'Редагувати картину' : 'Нова картина'"
-                class="mb-4"></h1>
-
-            <form th:action="${artwork.id != null}
-                              ? @{/admin/artworks/{id}/edit(id=${artwork.id})}
-                              : @{/admin/artworks/new}"
-                  th:object="${artwork}"
-                  method="post"
-                  enctype="multipart/form-data">
-
-                <!-- Назва -->
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{admin.newArtwork})}"></head>
+  <body class="admin-page">
+    <nav th:replace="~{fragments/site :: adminHeader}"></nav>
+    <main class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8">
+          <h1
+            class="mb-4"
+            th:text="${artwork.id != null} ? #{admin.editArtwork} : #{admin.newArtwork}"
+          ></h1>
+          <form
+            th:action="${artwork.id != null} ? @{/admin/artworks/{id}/edit(id=${artwork.id})} : @{/admin/artworks/new}"
+            th:object="${artwork}"
+            method="post"
+            enctype="multipart/form-data"
+          >
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="title"
+                th:text="#{field.title}"
+              ></label
+              ><input
+                type="text"
+                class="form-control"
+                id="title"
+                th:field="*{title}"
+                required
+                th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
+              />
+              <div class="invalid-feedback" th:errors="*{title}"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Назва <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control"
-                           th:field="*{title}"
-                           th:classappend="${#fields.hasErrors('title')} ? 'is-invalid'"
-                           placeholder="Назва роботи">
-                    <div class="invalid-feedback" th:errors="*{title}"></div>
+                  <label
+                    class="form-label"
+                    for="year"
+                    th:text="#{field.year}"
+                  ></label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="year"
+                    min="1900"
+                    max="2099"
+                    th:field="*{year}"
+                    required
+                    th:classappend="${#fields.hasErrors('year')} ? 'is-invalid'"
+                  />
+                  <div class="invalid-feedback" th:errors="*{year}"></div>
                 </div>
-
-                <!-- Рік + Ціна -->
-                <div class="row">
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Рік <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control"
-                               th:field="*{year}"
-                               th:classappend="${#fields.hasErrors('year')} ? 'is-invalid'"
-                               min="1900" max="2099">
-                        <div class="invalid-feedback" th:errors="*{year}"></div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Ціна (грн)</label>
-                        <input type="number" class="form-control"
-                               th:field="*{price}"
-                               th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'"
-                               min="0" step="0.01"
-                               placeholder="0.00">
-                        <div class="invalid-feedback" th:errors="*{price}"></div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label class="form-label">Жанр</label>
-                        <select class="form-select" th:field="*{genre}">
-                            <option value="">— оберіть —</option>
-                            <option value="Портрет">Портрет</option>
-                            <option value="Пейзаж">Пейзаж</option>
-                            <option value="Натюрморт">Натюрморт</option>
-                            <option value="Абстракція">Абстракція</option>
-                            <option value="Анімалістика">Анімалістика</option>
-                            <option value="Міський пейзаж">Міський пейзаж</option>
-                            <option value="Морський пейзаж">Морський пейзаж</option>
-                            <option value="Інше">Інше</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Матеріал + Основа -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Матеріал</label>
-                        <select class="form-select" th:field="*{material}">
-                            <option value="">— оберіть —</option>
-                            <option value="Олія">Олія</option>
-                            <option value="Акварель">Акварель</option>
-                            <option value="Акрил">Акрил</option>
-                            <option value="Пастель">Пастель</option>
-                            <option value="Графіт">Графіт</option>
-                            <option value="Вугілля">Вугілля</option>
-                            <option value="Темпера">Темпера</option>
-                            <option value="Змішана техніка">Змішана техніка</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Основа</label>
-                        <select class="form-select" th:field="*{surface}">
-                            <option value="">— оберіть —</option>
-                            <option value="Полотно">Полотно</option>
-                            <option value="Папір">Папір</option>
-                            <option value="Картон">Картон</option>
-                            <option value="Дерево">Дерево</option>
-                            <option value="ДВП">ДВП</option>
-                            <option value="Оргаліт">Оргаліт</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Розміри -->
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Ширина (см)</label>
-                        <input type="number" class="form-control"
-                               th:field="*{widthCm}"
-                               min="1" placeholder="60">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Висота (см)</label>
-                        <input type="number" class="form-control"
-                               th:field="*{heightCm}"
-                               min="1" placeholder="80">
-                    </div>
-                </div>
-
-                <!-- Опис -->
+              </div>
+              <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Опис</label>
-                    <textarea class="form-control" rows="4"
-                              th:field="*{description}"
-                              placeholder="Опис роботи, історія створення..."></textarea>
+                  <label
+                    class="form-label"
+                    for="price"
+                    th:text="#{field.price}"
+                  ></label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="price"
+                    min="0.01"
+                    step="0.01"
+                    th:field="*{price}"
+                    th:classappend="${#fields.hasErrors('price')} ? 'is-invalid'"
+                  />
+                  <div class="invalid-feedback" th:errors="*{price}"></div>
                 </div>
-
-                <!-- Категорії -->
+              </div>
+            </div>
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="genre"
+                th:text="#{field.genre}"
+              ></label
+              ><select class="form-select" id="genre" th:field="*{genre}">
+                <option value="" th:text="#{admin.choose}"></option>
+                <option
+                  value="Портрет"
+                  th:text="${@portfolioText.term('Портрет',#locale)}"
+                ></option>
+                <option
+                  value="Пейзаж"
+                  th:text="${@portfolioText.term('Пейзаж',#locale)}"
+                ></option>
+                <option
+                  value="Натюрморт"
+                  th:text="${@portfolioText.term('Натюрморт',#locale)}"
+                ></option>
+                <option
+                  value="Абстракція"
+                  th:text="${@portfolioText.term('Абстракція',#locale)}"
+                ></option>
+                <option
+                  value="Анімалістика"
+                  th:text="${@portfolioText.term('Анімалістика',#locale)}"
+                ></option>
+                <option
+                  value="Міський пейзаж"
+                  th:text="${@portfolioText.term('Міський пейзаж',#locale)}"
+                ></option>
+                <option
+                  value="Морський пейзаж"
+                  th:text="${@portfolioText.term('Морський пейзаж',#locale)}"
+                ></option>
+                <option
+                  value="Інше"
+                  th:text="${@portfolioText.term('Інше',#locale)}"
+                ></option>
+              </select>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Категорії</label>
-                    <div class="d-flex flex-wrap gap-2">
-                        <div th:each="cat : ${categories}" class="form-check">
-                            <input class="form-check-input" type="checkbox"
-                                   name="categoryIds"
-                                   th:value="${cat.id}"
-                                   th:checked="${artwork.categories != null and artwork.categories.contains(cat)}">
-                            <label class="form-check-label" th:text="${cat.name}"></label>
-                        </div>
-                    </div>
+                  <label
+                    class="form-label"
+                    for="material"
+                    th:text="#{field.material}"
+                  ></label
+                  ><select
+                    class="form-select"
+                    id="material"
+                    th:field="*{material}"
+                  >
+                    <option value="" th:text="#{admin.choose}"></option>
+                    <option
+                      value="Олія"
+                      th:text="${@portfolioText.term('Олія',#locale)}"
+                    ></option>
+                    <option
+                      value="Акварель"
+                      th:text="${@portfolioText.term('Акварель',#locale)}"
+                    ></option>
+                    <option
+                      value="Акрил"
+                      th:text="${@portfolioText.term('Акрил',#locale)}"
+                    ></option>
+                    <option
+                      value="Пастель"
+                      th:text="${@portfolioText.term('Пастель',#locale)}"
+                    ></option>
+                    <option
+                      value="Графіт"
+                      th:text="${@portfolioText.term('Графіт',#locale)}"
+                    ></option>
+                    <option
+                      value="Вугілля"
+                      th:text="${@portfolioText.term('Вугілля',#locale)}"
+                    ></option>
+                    <option
+                      value="Темпера"
+                      th:text="${@portfolioText.term('Темпера',#locale)}"
+                    ></option>
+                    <option
+                      value="Змішана техніка"
+                      th:text="${@portfolioText.term('Змішана техніка',#locale)}"
+                    ></option>
+                  </select>
                 </div>
-
-                <!-- Зображення -->
+              </div>
+              <div class="col-md-6">
                 <div class="mb-3">
-                    <label class="form-label">Зображення</label>
-                    <div th:if="${artwork.imageUrl}" class="mb-2">
-                        <img th:src="@{'/' + ${artwork.imageUrl}}"
-                             style="max-height: 150px; border-radius: 4px;"
-                             alt="Поточне зображення">
-                        <p class="text-muted small mt-1">Завантажте нове зображення щоб замінити</p>
-                    </div>
-                    <input type="file" class="form-control"
-                           name="imageFile"
-                           accept="image/*">
+                  <label
+                    class="form-label"
+                    for="surface"
+                    th:text="#{field.surface}"
+                  ></label
+                  ><select
+                    class="form-select"
+                    id="surface"
+                    th:field="*{surface}"
+                  >
+                    <option value="" th:text="#{admin.choose}"></option>
+                    <option
+                      value="Полотно"
+                      th:text="${@portfolioText.term('Полотно',#locale)}"
+                    ></option>
+                    <option
+                      value="Папір"
+                      th:text="${@portfolioText.term('Папір',#locale)}"
+                    ></option>
+                    <option
+                      value="Картон"
+                      th:text="${@portfolioText.term('Картон',#locale)}"
+                    ></option>
+                    <option
+                      value="Дерево"
+                      th:text="${@portfolioText.term('Дерево',#locale)}"
+                    ></option>
+                    <option
+                      value="ДВП"
+                      th:text="${@portfolioText.term('ДВП',#locale)}"
+                    ></option>
+                    <option
+                      value="Оргаліт"
+                      th:text="${@portfolioText.term('Оргаліт',#locale)}"
+                    ></option>
+                  </select>
                 </div>
-
-                <!-- Доступна + Опублікована -->
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input"
-                                   th:field="*{available}" id="available">
-                            <label class="form-check-label" for="available">
-                                Доступна для продажу
-                            </label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check">
-                            <input type="checkbox" class="form-check-input"
-                                   th:field="*{published}" id="published">
-                            <label class="form-check-label" for="published">
-                                Опублікувати в галереї
-                            </label>
-                        </div>
-                    </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    class="form-label"
+                    for="widthCm"
+                    th:text="#{field.width}"
+                  ></label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="widthCm"
+                    min="1"
+                    th:field="*{widthCm}"
+                    th:classappend="${#fields.hasErrors('widthCm')} ? 'is-invalid'"
+                  />
+                  <div class="invalid-feedback" th:errors="*{widthCm}"></div>
                 </div>
-
-                <div class="d-flex gap-2">
-                    <button type="submit" class="btn btn-dark">Зберегти</button>
-                    <a th:href="@{/admin/artworks}" class="btn btn-outline-secondary">Скасувати</a>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label
+                    class="form-label"
+                    for="heightCm"
+                    th:text="#{field.height}"
+                  ></label
+                  ><input
+                    type="number"
+                    class="form-control"
+                    id="heightCm"
+                    min="1"
+                    th:field="*{heightCm}"
+                    th:classappend="${#fields.hasErrors('heightCm')} ? 'is-invalid'"
+                  />
+                  <div class="invalid-feedback" th:errors="*{heightCm}"></div>
                 </div>
-
-            </form>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label
+                class="form-label"
+                for="description"
+                th:text="#{field.description}"
+              ></label
+              ><textarea
+                rows="5"
+                class="form-control"
+                id="description"
+                th:field="*{description}"
+                th:classappend="${#fields.hasErrors('description')} ? 'is-invalid'"
+              ></textarea>
+              <div class="invalid-feedback" th:errors="*{description}"></div>
+            </div>
+            <section class="translation-fields">
+              <h2 th:text="#{admin.english}"></h2>
+              <div class="mb-3">
+                <label
+                  class="form-label"
+                  for="titleEn"
+                  th:text="#{admin.titleEn}"
+                ></label
+                ><input
+                  type="text"
+                  class="form-control"
+                  id="titleEn"
+                  th:field="*{titleEn}"
+                  th:classappend="${#fields.hasErrors('titleEn')} ? 'is-invalid'"
+                />
+                <div class="invalid-feedback" th:errors="*{titleEn}"></div>
+              </div>
+              <div class="mb-3">
+                <label
+                  class="form-label"
+                  for="descriptionEn"
+                  th:text="#{admin.descriptionEn}"
+                ></label
+                ><textarea
+                  rows="5"
+                  class="form-control"
+                  id="descriptionEn"
+                  th:field="*{descriptionEn}"
+                  th:classappend="${#fields.hasErrors('descriptionEn')} ? 'is-invalid'"
+                ></textarea>
+                <div
+                  class="invalid-feedback"
+                  th:errors="*{descriptionEn}"
+                ></div>
+              </div>
+            </section>
+            <fieldset class="mb-4">
+              <legend class="form-label" th:text="#{field.categories}"></legend>
+              <div class="d-flex flex-wrap gap-3">
+                <div class="form-check" th:each="cat : ${categories}">
+                  <input
+                    type="checkbox"
+                    class="form-check-input"
+                    name="categoryIds"
+                    th:id="${'category-' + cat.id}"
+                    th:value="${cat.id}"
+                    th:checked="${artwork.categories != null and artwork.categories.contains(cat)}"
+                  /><label
+                    class="form-check-label"
+                    th:for="${'category-' + cat.id}"
+                    th:text="${@portfolioText.term(cat.name,#locale)}"
+                  ></label>
+                </div>
+              </div>
+            </fieldset>
+            <div class="mb-4">
+              <label
+                class="form-label"
+                for="imageFile"
+                th:text="#{field.image}"
+              ></label>
+              <div th:if="${artwork.imageUrl}" class="mb-3">
+                <img
+                  th:src="@{'/' + ${artwork.imageUrl}}"
+                  th:alt="${artwork.title}"
+                  style="max-height: 180px"
+                />
+              </div>
+              <input
+                id="imageFile"
+                name="imageFile"
+                type="file"
+                accept="image/*"
+                class="form-control"
+              />
+            </div>
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="available"
+                th:field="*{available}"
+              /><label
+                class="form-check-label"
+                for="available"
+                th:text="#{admin.available}"
+              ></label>
+            </div>
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="published"
+                th:field="*{published}"
+              /><label
+                class="form-check-label"
+                for="published"
+                th:text="#{admin.publishArtwork}"
+              ></label>
+            </div>
+            <div class="d-flex gap-3 mt-4">
+              <button
+                class="btn btn-dark"
+                type="submit"
+                th:text="#{action.save}"
+              ></button
+              ><a
+                class="btn btn-outline-secondary"
+                th:href="@{/admin/artworks}"
+                th:text="#{action.cancel}"
+              ></a>
+            </div>
+          </form>
         </div>
-    </div>
-</main>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+      </div>
+    </main>
+  </body>
 </html>
