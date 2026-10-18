@@ -5,11 +5,13 @@ import com.example.artist.entity.Order;
 import com.example.artist.service.ArtworkService;
 import com.example.artist.service.OrderService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -20,11 +22,6 @@ public class OrderController {
     private final OrderService orderService;
     private final ArtworkService artworkService;
 
-    @InitBinder("order")
-    public void bindOrder(WebDataBinder binder) {
-        binder.setAllowedFields("customerName", "customerEmail", "customerPhone", "message");
-    }
-
     @GetMapping("/{id}")
     public String orderForm(@PathVariable Long id, Model model) {
         Artwork artwork = artworkService.getPublishedById(id);
@@ -32,14 +29,14 @@ public class OrderController {
             return "redirect:/gallery/" + id;
         }
         model.addAttribute("artwork", artwork);
-        model.addAttribute("order", new Order());
+        model.addAttribute("order", new OrderForm());
         return "order";
     }
 
     @PostMapping("/{id}")
     public String submitOrder(
             @PathVariable Long id,
-            @Valid @ModelAttribute("order") Order order,
+            @Valid @ModelAttribute("order") OrderForm form,
             BindingResult bindingResult,
             Model model) {
 
@@ -52,6 +49,11 @@ public class OrderController {
         if (!artwork.isAvailable()) {
             return "redirect:/gallery/" + id;
         }
+        Order order = new Order();
+        order.setCustomerName(form.getCustomerName());
+        order.setCustomerEmail(form.getCustomerEmail());
+        order.setCustomerPhone(form.getCustomerPhone());
+        order.setMessage(form.getMessage());
         order.setArtwork(artwork);
         orderService.save(order);
 
@@ -61,5 +63,18 @@ public class OrderController {
     @GetMapping("/success")
     public String success() {
         return "order-success";
+    }
+
+    @Data
+    public static class OrderForm {
+        @NotBlank(message = "Ім'я обов'язкове")
+        private String customerName;
+
+        @Email(message = "Невірний формат email")
+        @NotBlank(message = "Email обов'язковий")
+        private String customerEmail;
+
+        private String customerPhone;
+        private String message;
     }
 }

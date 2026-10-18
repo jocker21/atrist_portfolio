@@ -40,7 +40,7 @@ order availability, restricted order fields, drafts and blog pagination.
 - Repeated blog titles/slugs receive a numeric suffix; editing keeps an existing unique slug.
 - Auto-generated slugs preserve Ukrainian letters and have a fallback for symbol-only titles.
 - Valid contact submissions are stored in the `contact_messages` table. The confirmation says the message was saved. Email delivery is not configured; there is no contact inbox page yet.
-- Added regression tests for public routes, contacts, blog slugs, login navigation and logout. All 16 tests pass with Java 24 and H2.
+- Added regression tests for public routes, contacts, blog slugs, login navigation and logout.
 
 The repository contains source code and the original images, without build output or a database dump.
 
@@ -49,3 +49,11 @@ The repository contains source code and the original images, without build outpu
 The public menu shows Login to visitors and the administrator panel to signed-in
 administrators. Logout ends the session and returns to the home page.
 Both login and logout are covered by regression tests.
+
+## Application and File Handling
+
+- The entry point is `com.example.artist.ArtistPortfolioApplication`.
+- Orders use a dedicated form DTO; client-supplied IDs, status and timestamps are ignored.
+- Artwork image files are deleted only after the database deletion commits. Paths outside the upload directory are rejected.
+- Thymeleaf Layout Dialect is included through Spring Boot dependency management.
+- All 21 tests pass with Java 24 and H2, including order validation, rollback and file deletion checks.

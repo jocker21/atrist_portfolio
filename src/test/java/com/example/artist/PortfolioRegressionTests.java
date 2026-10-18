@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -92,14 +93,21 @@ class PortfolioRegressionTests {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void customerCannotSetOrderStatusAndAdminCanViewOrder() throws Exception {
+    void customerCannotSetOrderMetadataAndAdminCanViewOrder() throws Exception {
         Artwork artwork = artwork(true);
+        LocalDateTime earliestCreation = LocalDateTime.now().minusSeconds(1);
         mvc.perform(post("/order/" + artwork.getId()).with(csrf())
                         .param("customerName", "Customer").param("customerEmail", "customer@example.com")
-                        .param("status", "CONFIRMED"))
+                        .param("status", "CONFIRMED")
+                        .param("id", "999999")
+                        .param("artwork.id", "999999")
+                        .param("createdAt", "2000-01-01T00:00:00"))
                 .andExpect(redirectedUrl("/order/success"));
         Order order = orders.findAll().getLast();
         assertThat(order.getStatus()).isEqualTo(Order.OrderStatus.NEW);
+        assertThat(order.getId()).isNotEqualTo(999999L);
+        assertThat(order.getArtwork().getId()).isEqualTo(artwork.getId());
+        assertThat(order.getCreatedAt()).isAfter(earliestCreation);
         mvc.perform(get("/admin/orders/" + order.getId())).andExpect(status().isOk())
                 .andExpect(content().string(containsString("customer@example.com")));
     }
@@ -140,6 +148,18 @@ class PortfolioRegressionTests {
     @Test
     void negativeBlogPageDoesNotFail() throws Exception {
         mvc.perform(get("/blog").param("page", "-1")).andExpect(status().isOk());
+    }
+
+    @Test
+    void invalidOrderFormShowsValidationErrorsWithoutSaving() throws Exception {
+        Artwork artwork = artwork(true);
+        long count = orders.count();
+        mvc.perform(post("/order/" + artwork.getId()).with(csrf())
+                        .param("customerName", "").param("customerEmail", "invalid-email"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("order"))
+                .andExpect(model().attributeHasFieldErrors("order", "customerName", "customerEmail"));
+        assertThat(orders.count()).isEqualTo(count);
     }
 
     @Test
