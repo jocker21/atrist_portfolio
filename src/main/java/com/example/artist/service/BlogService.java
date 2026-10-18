@@ -7,6 +7,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.Locale;
 
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class BlogService {
     // Найти статью по slug для страницы /blog/moya-vystavka
     public BlogPost getBySlug(String slug) {
         return blogPostRepository.findBySlugAndPublishedTrue(slug)
-                .orElseThrow(() -> new RuntimeException("Статья не найдена: " + slug));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Статья не найдена"));
     }
 
     // Последние 3 статьи для виджета на главной странице
@@ -40,16 +43,38 @@ public class BlogService {
 
     // Сохранить статью (новую или обновлённую)
     public BlogPost save(BlogPost post) {
+        if (post.getId() != null) {
+            BlogPost existing = getById(post.getId());
+            post.setCreatedAt(existing.getCreatedAt());
+            post.setPublishedAt(existing.getPublishedAt());
+            post.setCoverImageUrl(existing.getCoverImageUrl());
+        }
         // Автогенерация slug из заголовка если не задан
         if (post.getSlug() == null || post.getSlug().isBlank()) {
             post.setSlug(generateSlug(post.getTitle()));
         }
+        String baseSlug = post.getSlug();
+        String candidate = baseSlug;
+        int suffix = 2;
+        while (slugTakenByAnotherPost(candidate, post.getId())) {
+            candidate = baseSlug + "-" + suffix++;
+        }
+        post.setSlug(candidate);
         return blogPostRepository.save(post);
+    }
+
+    private boolean slugTakenByAnotherPost(String slug, Long id) {
+        return blogPostRepository.findBySlug(slug)
+                .filter(existing -> !existing.getId().equals(id)).isPresent();
     }
 
     public BlogPost getById(Long id) {
         return blogPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Статья не найдена: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Статья не найдена"));
+    }
+
+    public List<BlogPost> getAll() {
+        return blogPostRepository.findAll();
     }
 
     public void delete(Long id) {
@@ -59,10 +84,11 @@ public class BlogService {
     // Преобразует заголовок в slug: "Моя выставка 2024" → "moya-vystavka-2024"
     // Упрощённая версия — для продакшена используй библиотеку slugify
     private String generateSlug(String title) {
-        return title.toLowerCase()
-                .replaceAll("[^a-z0-9а-яё\\s-]", "")
+        String slug = title.toLowerCase(Locale.ROOT).trim()
+                .replaceAll("[^\\p{L}\\p{N}\\s-]", "")
                 .replaceAll("\\s+", "-")
                 .replaceAll("-+", "-")
-                .trim();
+                .replaceAll("^-|-$", "");
+        return slug.isBlank() ? "post" : slug;
     }
 }

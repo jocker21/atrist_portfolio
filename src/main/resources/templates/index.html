@@ -17,6 +17,7 @@
             <a class="nav-link" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакты</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -25,15 +26,7 @@
 
     <!-- Блок "Об авторе" -->
     <section class="row align-items-center mb-5">
-        <div class="col-md-4 text-center">
-            <!-- th:src — генерирует корректный путь к изображению -->
-            <img th:src="@{/images/author-photo.jpg}"
-                 src="/images/author-photo.jpg"
-                 alt="Фото художника"
-                 class="img-fluid rounded-circle"
-                 style="max-width: 250px;">
-        </div>
-        <div class="col-md-8">
+        <div class="col-12">
             <h1>Имя Художника</h1>
             <!-- Девиз или цитата -->
             <blockquote class="blockquote">
@@ -63,7 +56,7 @@
                 <div class="card h-100 shadow-sm">
                     <!-- th:if — показываем изображение только если оно есть -->
                     <img th:if="${artwork.imageUrl}"
-                         th:src="@{'/' + artwork.imageUrl}"
+                         th:src="@{'/' + ${artwork.imageUrl}}"
                          class="card-img-top"
                          style="height: 220px; object-fit: cover;"
                          th:alt="${artwork.title}">

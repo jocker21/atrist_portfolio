@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
+    Optional<BlogPost> findBySlug(String slug);
     Page<BlogPost> findByPublishedTrueOrderByPublishedAtDesc(Pageable pageable);
     Optional<BlogPost> findBySlugAndPublishedTrue(String slug);
     List<BlogPost> findTop3ByPublishedTrueOrderByPublishedAtDesc();

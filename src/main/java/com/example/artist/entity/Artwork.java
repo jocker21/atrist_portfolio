@@ -32,6 +32,7 @@ public class Artwork {
     private String description;
 
     @NotNull(message = "Рік створення обов'язковий")
+    @Column(nullable = false)
     private Integer year;
 
     private String material;

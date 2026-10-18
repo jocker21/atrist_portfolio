@@ -7,6 +7,8 @@ import com.example.artist.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -50,10 +52,24 @@ public class ArtworkService {
 
     public Artwork getById(Long id) {
         return artworkRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Картину не знайдено: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Картину не знайдено"));
+    }
+
+    public Artwork getPublishedById(Long id) {
+        Artwork artwork = getById(id);
+        if (!artwork.isPublished()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Картину не знайдено");
+        }
+        return artwork;
     }
 
     public Artwork save(Artwork artwork, MultipartFile imageFile, List<Long> categoryIds) throws IOException {
+        if (artwork.getId() != null) {
+            Artwork existingArtwork = getById(artwork.getId());
+            artwork.setCreatedAt(existingArtwork.getCreatedAt());
+            artwork.setImageUrl(existingArtwork.getImageUrl());
+        }
+
         if (imageFile != null && !imageFile.isEmpty()) {
             validateImageFile(imageFile);
             String imagePath = saveImage(imageFile);
@@ -94,8 +110,10 @@ public class ArtworkService {
         String filename = UUID.randomUUID() + extension;
 
         Path filePath = uploadPath.resolve(filename);
-        Files.copy(file.getInputStream(), filePath);
+        try (var input = file.getInputStream()) {
+            Files.copy(input, filePath);
+        }
 
-        return uploadDir + "/" + filename;
+        return "uploads/artworks/" + filename;
     }
 }

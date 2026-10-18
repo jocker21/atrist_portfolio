@@ -16,6 +16,7 @@
             <a class="nav-link active" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакти</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -27,7 +28,7 @@
         <!-- Фото -->
         <div class="col-md-7">
             <img th:if="${artwork.imageUrl != null}"
-                 th:src="@{/(${artwork.imageUrl})}"
+                 th:src="@{'/' + ${artwork.imageUrl}}"
                  th:alt="${artwork.title}"
                  class="img-fluid rounded shadow"/>
             <div th:if="${artwork.imageUrl == null}"

@@ -4,6 +4,7 @@ import com.example.artist.entity.User;
 import com.example.artist.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -14,10 +15,19 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${app.admin.password:}")
+    private String adminPassword;
+
     @Override
     public void run(String... args) {
-        createUserIfNotExists("admin", "admin_admin", "ROLE_ADMIN");
-        createUserIfNotExists("user", "user_user", "ROLE_USER");
+        if (adminPassword == null || adminPassword.isBlank()) {
+            System.out.println("Admin user was not created: set app.admin.password or APP_ADMIN_PASSWORD first.");
+            return;
+        }
+        createUserIfNotExists(adminUsername, adminPassword, "ROLE_ADMIN");
     }
 
     private void createUserIfNotExists(String username, String rawPassword, String role) {

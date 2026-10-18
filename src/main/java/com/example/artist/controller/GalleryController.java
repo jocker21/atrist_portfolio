@@ -54,7 +54,7 @@ public class GalleryController {
     // Страница отдельной работы: /gallery/42
     @GetMapping("/{id}")
     public String artworkDetail(@PathVariable Long id, Model model) {
-        model.addAttribute("artwork", artworkService.getById(id));
+        model.addAttribute("artwork", artworkService.getPublishedById(id));
         return "artwork-detail";
     }
 }

@@ -1,0 +1,9 @@
+<form xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      th:fragment="button"
+      th:action="@{/logout}"
+      method="post"
+      sec:authorize="isAuthenticated()"
+      class="m-0 d-flex align-items-center">
+    <button type="submit" class="nav-link border-0 bg-transparent">Выйти</button>
+</form>

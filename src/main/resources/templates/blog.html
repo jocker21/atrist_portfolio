@@ -16,6 +16,7 @@
             <a class="nav-link" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link active" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакты</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -30,7 +31,7 @@
         <div class="col-md-6" th:each="post : ${postsPage.content}">
             <div class="card h-100 shadow-sm">
                 <img th:if="${post.coverImageUrl}"
-                     th:src="@{'/' + post.coverImageUrl}"
+                     th:src="@{'/' + ${post.coverImageUrl}}"
                      class="card-img-top"
                      style="height: 200px; object-fit: cover;"
                      th:alt="${post.title}">

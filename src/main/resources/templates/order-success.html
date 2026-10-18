@@ -16,6 +16,7 @@
             <a class="nav-link" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакти</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>

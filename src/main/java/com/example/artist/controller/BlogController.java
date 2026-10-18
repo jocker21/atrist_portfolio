@@ -17,7 +17,7 @@ public class BlogController {
     @GetMapping
     public String blog(@RequestParam(defaultValue = "0") int page, Model model) {
         // getPublishedPage(page, 6) — 6 статей на странице
-        model.addAttribute("postsPage", blogService.getPublishedPage(page, 6));
+        model.addAttribute("postsPage", blogService.getPublishedPage(Math.max(page, 0), 6));
         return "blog";
     }
 

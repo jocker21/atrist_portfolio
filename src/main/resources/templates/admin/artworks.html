@@ -14,7 +14,7 @@
             <a class="nav-link active" th:href="@{/admin/artworks}">Работы</a>
             <a class="nav-link" th:href="@{/admin/blog}">Блог</a>
             <a class="nav-link" th:href="@{/}">На сайт</a>
-            <a class="nav-link" th:href="@{/logout}">Выйти</a>
+            <th:block th:replace="~{fragments/logout :: button}"></th:block>
         </div>
     </div>
 </nav>
@@ -43,14 +43,14 @@
             <tr th:each="artwork : ${artworks}">
                 <td style="width: 80px;">
                     <img th:if="${artwork.imageUrl}"
-                         th:src="@{'/' + artwork.imageUrl}"
+                         th:src="@{'/' + ${artwork.imageUrl}}"
                          style="width:60px; height:60px; object-fit:cover; border-radius:4px;"
                          th:alt="${artwork.title}">
                     <span th:unless="${artwork.imageUrl}" class="text-muted">—</span>
                 </td>
                 <td th:text="${artwork.title}">Название</td>
                 <td th:text="${artwork.year}">2024</td>
-                <td th:text="${artwork.technique ?: '—'}">Масло</td>
+                <td th:text="${artwork.material ?: '—'}">Масло</td>
                 <td>
                     <!-- Индикатор публикации -->
                     <span th:if="${artwork.published}"

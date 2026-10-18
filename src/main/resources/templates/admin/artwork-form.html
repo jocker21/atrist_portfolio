@@ -144,7 +144,7 @@
                 <div class="mb-3">
                     <label class="form-label">Зображення</label>
                     <div th:if="${artwork.imageUrl}" class="mb-2">
-                        <img th:src="@{'/' + artwork.imageUrl}"
+                        <img th:src="@{'/' + ${artwork.imageUrl}}"
                              style="max-height: 150px; border-radius: 4px;"
                              alt="Поточне зображення">
                         <p class="text-muted small mt-1">Завантажте нове зображення щоб замінити</p>

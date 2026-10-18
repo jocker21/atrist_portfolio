@@ -16,6 +16,7 @@
             <a class="nav-link active" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакты</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -73,7 +74,7 @@
             <div class="card h-100 shadow-sm artwork-card">
                 <div class="overflow-hidden" style="height: 260px;">
                     <img th:if="${artwork.imageUrl}"
-                         th:src="@{'/' + artwork.imageUrl}"
+                         th:src="@{'/' + ${artwork.imageUrl}}"
                          th:alt="${artwork.title}"
                          class="card-img-top w-100 h-100"
                          style="object-fit: cover; transition: transform 0.3s;">
@@ -87,9 +88,13 @@
                     <h5 class="card-title" th:text="${artwork.title}">Название</h5>
                     <p class="card-text">
                         <span class="text-muted" th:text="${artwork.year}">2024</span>
-                        <span th:if="${artwork.technique}"
+                        <span th:if="${artwork.material}"
                               class="badge bg-secondary ms-2"
-                              th:text="${artwork.technique}">
+                              th:text="${artwork.material}">
+                        </span>
+                        <span th:if="${artwork.surface}"
+                              class="badge bg-light text-dark border ms-1"
+                              th:text="${artwork.surface}">
                         </span>
                     </p>
                     <!-- Категории работы -->

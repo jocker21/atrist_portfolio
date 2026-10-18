@@ -14,7 +14,7 @@
             <a class="nav-link" th:href="@{/admin/artworks}">Работы</a>
             <a class="nav-link active" th:href="@{/admin/blog}">Блог</a>
             <a class="nav-link" th:href="@{/}">На сайт</a>
-            <a class="nav-link" th:href="@{/logout}">Выйти</a>
+            <th:block th:replace="~{fragments/logout :: button}"></th:block>
         </div>
     </div>
 </nav>

@@ -1,0 +1,7 @@
+<th:block xmlns:th="http://www.thymeleaf.org"
+          xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+          th:fragment="links">
+    <a class="nav-link" th:href="@{/login}" sec:authorize="isAnonymous()">Вход</a>
+    <a class="nav-link" th:href="@{/admin/artworks}" sec:authorize="hasRole('ADMIN')">Админ-панель</a>
+    <th:block th:replace="~{fragments/logout :: button}"></th:block>
+</th:block>

@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -19,9 +20,14 @@ public class OrderController {
     private final OrderService orderService;
     private final ArtworkService artworkService;
 
+    @InitBinder("order")
+    public void bindOrder(WebDataBinder binder) {
+        binder.setAllowedFields("customerName", "customerEmail", "customerPhone", "message");
+    }
+
     @GetMapping("/{id}")
     public String orderForm(@PathVariable Long id, Model model) {
-        Artwork artwork = artworkService.getById(id);
+        Artwork artwork = artworkService.getPublishedById(id);
         if (!artwork.isAvailable()) {
             return "redirect:/gallery/" + id;
         }
@@ -38,11 +44,14 @@ public class OrderController {
             Model model) {
 
         if (bindingResult.hasErrors()) {
-            model.addAttribute("artwork", artworkService.getById(id));
+            model.addAttribute("artwork", artworkService.getPublishedById(id));
             return "order";
         }
 
-        Artwork artwork = artworkService.getById(id);
+        Artwork artwork = artworkService.getPublishedById(id);
+        if (!artwork.isAvailable()) {
+            return "redirect:/gallery/" + id;
+        }
         order.setArtwork(artwork);
         orderService.save(order);
 

@@ -16,6 +16,7 @@
             <a class="nav-link" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link" th:href="@{/contact}">Контакти</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -30,7 +31,7 @@
             <div class="card mb-4">
                 <div class="card-body d-flex gap-3 align-items-center">
                     <img th:if="${artwork.imageUrl != null}"
-                         th:src="@{/(${artwork.imageUrl})}"
+                         th:src="@{'/' + ${artwork.imageUrl}}"
                          th:alt="${artwork.title}"
                          style="width: 80px; height: 80px; object-fit: cover;"
                          class="rounded"/>

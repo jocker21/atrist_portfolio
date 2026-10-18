@@ -1,6 +1,9 @@
 package com.example.artist.controller;
 
 import jakarta.validation.Valid;
+import com.example.artist.entity.ContactMessage;
+import com.example.artist.repository.ContactMessageRepository;
+import lombok.RequiredArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
@@ -14,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/contact")
+@RequiredArgsConstructor
 public class ContactController {
+    private final ContactMessageRepository contactMessageRepository;
 
     // GET /contact — показать форму
     @GetMapping
@@ -41,10 +46,11 @@ public class ContactController {
             return "contact";
         }
 
-        // TODO: здесь будет отправка email через Spring Mail
-        // Пока просто логируем
-        System.out.println("Новое сообщение от: " + form.getEmail());
-        System.out.println("Текст: " + form.getMessage());
+        ContactMessage message = new ContactMessage();
+        message.setName(form.getName());
+        message.setEmail(form.getEmail());
+        message.setMessage(form.getMessage());
+        contactMessageRepository.saveAndFlush(message);
 
         // Передаём флаг успеха в шаблон для показа сообщения
         model.addAttribute("success", true);

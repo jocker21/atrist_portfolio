@@ -95,7 +95,7 @@ public class AdminController {
 
     @GetMapping("/blog")
     public String blogList(Model model) {
-        model.addAttribute("posts", blogService.getPublishedPage(0, 50).getContent());
+        model.addAttribute("posts", blogService.getAll());
         return "admin/blog";
     }
 

@@ -16,6 +16,7 @@
             <a class="nav-link" th:href="@{/gallery}">Галерея</a>
             <a class="nav-link" th:href="@{/blog}">Блог</a>
             <a class="nav-link active" th:href="@{/contact}">Контакты</a>
+            <th:block th:replace="~{fragments/account-nav :: links}"></th:block>
         </div>
     </div>
 </nav>
@@ -27,7 +28,7 @@
 
             <!-- Сообщение об успешной отправке -->
             <div th:if="${success}" class="alert alert-success">
-                Спасибо! Ваше сообщение отправлено. Я свяжусь с вами в ближайшее время.
+                Спасибо! Ваше сообщение сохранено.
             </div>
 
             <!-- ФОРМА ОБРАТНОЙ СВЯЗИ
@@ -38,9 +39,6 @@
                   th:object="${contactForm}"
                   method="post"
                   th:unless="${success}">
-
-                <!-- CSRF-токен — Spring Security автоматически добавляет его
-                     для защиты от подделки запросов. Thymeleaf делает это сам. -->
 
                 <div class="mb-3">
                     <label class="form-label">Ваше имя</label>
