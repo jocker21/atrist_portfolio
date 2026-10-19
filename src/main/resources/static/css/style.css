@@ -833,6 +833,13 @@ body:not(.home-page) > main {
   font-size: 18px;
   margin-right: auto;
 }
+.admin-page .admin-header .admin-brand,
+.admin-page .admin-header a:hover,
+.admin-page .admin-header a:focus-visible,
+.admin-page .admin-header .logout-form button:hover,
+.admin-page .admin-header .logout-form button:focus-visible {
+  color: var(--accent);
+}
 .admin-page h1 {
   font-family: Arial, Helvetica, sans-serif;
   font-size: 30px;
@@ -2071,7 +2078,7 @@ body:not(.home-page) .site-nav a.active {
   label:has(input[type="checkbox"]),
   label:has(input[type="radio"]) {
     cursor:
-      url("../images/fine-round-brush-cursor.svg") 5 31,
+      url("../images/fine-round-brush-cursor.svg") 5 19,
       pointer;
   }
   input:not([type]),

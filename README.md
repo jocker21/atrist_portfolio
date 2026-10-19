@@ -1,4 +1,7 @@
-# Artist Portfolio
+# Artist Portfolio (Beta)
+
+**Status: Beta.** This version is available for testing and feedback; it is not
+yet a production release.
 
 Spring Boot 3 application with Thymeleaf, Spring Security and PostgreSQL.
 Requires Java 21 or later and Maven (or the included Maven wrapper).
