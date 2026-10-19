@@ -14,6 +14,7 @@
       rel="stylesheet"
     />
     <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <script th:src="@{/js/vendor/lucide.min.js}" defer></script>
     <script th:src="@{/js/site.js}" defer></script>
     <script th:src="@{/js/artwork-media.js}" defer></script>
   </head>
@@ -26,7 +27,18 @@
           ></span
           ><small th:text="#{brand.caption}"></small
         ></a>
-        <nav class="site-nav" th:aria-label="#{nav.main}">
+        <button
+          class="mobile-menu-toggle"
+          type="button"
+          aria-controls="site-menu"
+          aria-expanded="false"
+          th:aria-label="#{nav.menu}"
+          th:title="#{nav.menu}"
+        >
+          <i data-lucide="menu" class="menu-open-icon" aria-hidden="true"></i>
+          <i data-lucide="x" class="menu-close-icon" aria-hidden="true"></i>
+        </button>
+        <nav id="site-menu" class="site-nav" th:aria-label="#{nav.main}">
           <a
             th:href="@{/}"
             th:classappend="${active == 'home'} ? 'active'"

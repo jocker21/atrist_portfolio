@@ -1806,7 +1806,7 @@ body:not(.home-page) .site-nav a.active {
   accent-color: var(--accent);
 }
 .home-page .hero-content h1 em {
-  color: #db8952;
+  color: var(--accent);
 }
 .site-nav a::after {
   width: 38px;
@@ -2096,6 +2096,162 @@ body:not(.home-page) .site-nav a.active {
   :disabled,
   [aria-disabled="true"],
   label:has(input:disabled) {
+    cursor: not-allowed;
+  }
+}
+.mobile-menu-toggle {
+  display: none;
+}
+@media (max-width: 700px) {
+  .site-header.nav-ready {
+    position: relative;
+    z-index: 10;
+  }
+  .nav-ready .header-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 14px;
+    padding-block: 18px;
+  }
+  .nav-ready .wordmark {
+    max-width: none;
+    min-width: 0;
+    margin: 0;
+  }
+  .nav-ready .header-tools {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    margin: 0;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .nav-ready .mobile-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    background: transparent;
+    color: inherit;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+  }
+  .mobile-menu-toggle svg {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+  .mobile-menu-toggle .menu-close-icon,
+  .is-menu-open .mobile-menu-toggle .menu-open-icon {
+    display: none;
+  }
+  .is-menu-open .mobile-menu-toggle .menu-close-icon {
+    display: block;
+  }
+  .nav-ready .site-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: min(250px, 100%);
+    max-height: 65dvh;
+    overflow-y: auto;
+    flex-direction: column;
+    align-items: stretch;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 10px 20px;
+    background: var(--paper);
+    background-image: linear-gradient(rgba(132, 133, 130, 0.88), rgba(132, 133, 130, 0.88)), url("../images/canvas-texture.png");
+    background-size: auto, 1024px 1024px;
+    color: var(--ink);
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 20px rgba(16, 25, 22, 0.22);
+  }
+  .nav-ready.is-menu-open .site-nav {
+    display: flex;
+  }
+  .nav-ready .site-nav a {
+    padding: 14px 0;
+    font-size: 14px;
+  }
+  .mobile-menu-toggle:focus-visible,
+  .nav-ready .site-nav a:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+  }
+}
+@media (max-width: 700px) and (orientation: portrait) {
+  .home-page .studio-hero .wordmark small {
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-top: 10px;
+    color: var(--accent-light);
+  }
+  .hero-content .button {
+    width: 160px;
+    max-width: 100%;
+    gap: 8px;
+    padding-inline: 12px;
+    font-size: 10px;
+  }
+  .hero-content .button > :first-child {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .hero-content .button > [aria-hidden] {
+    flex-shrink: 0;
+  }
+  .home-page .hero-content .button {
+    position: relative;
+    justify-content: center;
+    padding-inline: 26px;
+    text-align: center;
+  }
+  .home-page .hero-content .button > [aria-hidden] {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+.home-page {
+  --accent: #d1844b;
+  --accent-light: var(--accent);
+  --accent-ink: var(--ink);
+}
+.home-page .studio-hero .wordmark small {
+  color: var(--accent);
+  text-shadow: 0 1px 3px #000;
+}
+.home-page .hero-content h1 em {
+  text-shadow: 0 2px 6px #0009;
+}
+.home-page .button-accent,
+.home-page .button-accent:hover,
+.home-page .button-accent:focus-visible {
+  background: var(--accent);
+  color: var(--ink);
+}
+.home-page .site-nav a::after {
+  background: var(--accent);
+  -webkit-mask: url("../images/menu-brush-stroke.png") center / 100% 100% no-repeat;
+  mask: url("../images/menu-brush-stroke.png") center / 100% 100% no-repeat;
+}
+@media (hover: hover) and (pointer: fine) {
+  body.home-page,
+  .home-page label {
+    cursor: url("../images/home-orange-arrow-cursor.svg") 2 2, default;
+  }
+  .home-page .form-check-label,
+  .home-page label:has(input[type="checkbox"]),
+  .home-page label:has(input[type="radio"]) {
+    cursor: url("../images/fine-round-brush-cursor.svg") 5 19, pointer;
+  }
+  .home-page label:has(input:disabled) {
     cursor: not-allowed;
   }
 }

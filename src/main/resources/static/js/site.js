@@ -1,3 +1,33 @@
+const mobileHeader = document.querySelector(".site-header");
+const menuToggle = mobileHeader?.querySelector(".mobile-menu-toggle");
+if (menuToggle) {
+  const mobileLayout = window.matchMedia("(max-width: 700px)");
+  const setMenuOpen = (open) => {
+    mobileHeader.classList.toggle("is-menu-open", open);
+    menuToggle.setAttribute("aria-expanded", String(open));
+  };
+  mobileHeader.classList.add("nav-ready");
+  menuToggle.addEventListener("click", () => {
+    setMenuOpen(menuToggle.getAttribute("aria-expanded") !== "true");
+  });
+  mobileHeader.querySelector(".site-nav").addEventListener("click", (event) => {
+    if (event.target.closest("a")) setMenuOpen(false);
+  });
+  document.addEventListener("click", (event) => {
+    if (!mobileHeader.contains(event.target)) setMenuOpen(false);
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuToggle.getAttribute("aria-expanded") === "true") {
+      setMenuOpen(false);
+      menuToggle.focus();
+    }
+  });
+  mobileHeader.addEventListener("focusout", (event) => {
+    if (!mobileHeader.contains(event.relatedTarget)) setMenuOpen(false);
+  });
+  mobileLayout.addEventListener("change", () => setMenuOpen(false));
+}
+
 window.addEventListener("DOMContentLoaded", () => {
   if (window.lucide) window.lucide.createIcons();
 });
