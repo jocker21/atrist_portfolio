@@ -1,0 +1,17 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{media.photos})}"></head>
+  <body>
+    <header th:replace="~{fragments/site :: header('gallery')}"></header>
+    <main class="site-container section-space">
+      <h1 th:text="#{media.photos}"></h1>
+      <p role="alert" th:text="#{media.uploadLimit}"></p>
+      <a
+        class="text-link"
+        th:href="@{/admin/artworks}"
+        th:text="#{admin.artworks}"
+      ></a>
+    </main>
+    <footer th:replace="~{fragments/site :: footer}"></footer>
+  </body>
+</html>

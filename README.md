@@ -63,6 +63,57 @@ an explicitly captioned studio illustration, not a fabricated artist photograph.
 The light neutral canvas background uses a generated raster texture with a
 translucent off-white overlay across public pages and the admin interface.
 
+## Artwork Media, Prices and Sizes
+
+Each artwork keeps its cover plus up to six additional JPEG/PNG photos (5 MB and
+30 megapixels each) and one MP4 video (H.264, AAC audio or silent, up to 100 MB).
+Manage them in the artwork editor. New photos append in selection order; mark
+existing photos for removal to free slots. Selecting a video replaces the old one.
+Removal and replacement happen only after saving. Failed database transactions
+keep previous files and remove newly uploaded files. Artwork deletion removes
+its media after the database commit. Videos do not autoplay and support seeking.
+
+The editor accepts dimensions in centimetres or inches. Values are stored as
+decimal centimetres; one inch is exactly 2.54 cm. Existing integer dimensions
+remain valid. Visitors can select centimetres/inches and UAH/USD; the browser
+remembers their choice. Enter UAH and USD prices independently: no exchange-rate
+service or automatic conversion is used. An unset price in the selected currency
+is displayed as "Price on request".
+
+The existing Hibernate update setting adds artwork_photos and video_url/price_usd
+and changes width_cm/height_cm to decimal columns. Back up PostgreSQL and the
+uploads directory before deploying; schema updates have been tested with H2,
+not with a live PostgreSQL database. Include the new JCodec Maven dependency in
+deployment. Multipart limits are 100 MB per file and 136 MB per request; a reverse
+proxy, when used, must also allow the configured request size.
+
+## Gallery and Presentation
+
+Gallery filters combine material, surface, technique, genre, year, availability
+and a price range in the selected currency. Sorting supports year, price and the
+localized title; unknown prices are last in either price ordering. Drafts are
+excluded from public results and filter values. Legacy category URLs still work
+and combine with the other filters.
+
+Administrators can add dictionary entries and update their English translations
+at /admin/settings. Existing stored values remain available in the artwork editor.
+The added artwork_terms table and technique column use the existing Hibernate
+schema-update setting; back up the database before deployment.
+
+Additional images are a single horizontally scrollable thumbnail strip. Video
+opens in a native dialog, loads only when opened and is stopped/unloaded on close.
+No social profile links are configured yet; the four contact buttons are disabled.
+No buyer registration or social-login integration was added.
+
+The studio background includes a subdued grayscale interpretation of the supplied
+harbour painting on the distant easel. The menu underline uses a generated
+transparent paint-stroke bitmap. The cursor pair uses an orange
+arrow across the page and a custom thin, pointed round artist's brush over links
+and actions, with standard text-entry cursors retained. Both are native SVG
+cursor assets; touch devices keep their normal behaviour. The easel and canvas
+have also been reduced together for a deeper viewpoint and rebuilt support legs.
+Contact icons are from Simple Icons (CC0; license included).
+
 ## Tests
 
 Run `mvn test`. Tests use an isolated H2 database and require no PostgreSQL server.

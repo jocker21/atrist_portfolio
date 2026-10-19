@@ -3,24 +3,49 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 const viewer = document.querySelector(".image-viewer");
-const preview = document.querySelector("[data-image-preview]");
-if (viewer && preview && typeof viewer.showModal === "function") {
-  const viewerImage = viewer.querySelector(".viewer-image");
-  preview.addEventListener("click", (event) => {
-    if (
-      event.ctrlKey ||
-      event.metaKey ||
-      event.shiftKey ||
-      event.altKey ||
-      event.button !== 0
-    )
-      return;
-    const original = preview.querySelector("img");
-    if (!original.naturalWidth) return;
-    event.preventDefault();
-    viewerImage.src = preview.href;
-    viewer.showModal();
-    document.body.classList.add("viewer-open");
+const previews = [...document.querySelectorAll("[data-image-preview]")];
+if (viewer && previews.length && typeof viewer.showModal === "function") {
+  const image = viewer.querySelector(".viewer-image");
+  const previous = viewer.querySelector("[data-viewer-previous]");
+  const next = viewer.querySelector("[data-viewer-next]");
+  let index = 0;
+  let trigger = previews[0];
+  const show = (position) => {
+    index = Math.max(0, Math.min(position, previews.length - 1));
+    image.classList.remove("broken-image");
+    image.src = previews[index].href;
+    image.alt = previews[index].querySelector("img").alt;
+    previous.disabled = index === 0;
+    next.disabled = index === previews.length - 1;
+    viewer.querySelector("[data-viewer-counter]").textContent =
+      index + 1 + " / " + previews.length;
+    viewer.querySelector(".viewer-navigation").hidden = previews.length < 2;
+  };
+  previews.forEach((preview, position) => {
+    preview.addEventListener("click", (event) => {
+      if (
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        event.altKey ||
+        event.button !== 0
+      )
+        return;
+      if (!preview.querySelector("img").naturalWidth) return;
+      event.preventDefault();
+      trigger = preview;
+      show(position);
+      viewer.showModal();
+      document.body.classList.add("viewer-open");
+    });
+  });
+  previous.addEventListener("click", () => show(index - 1));
+  next.addEventListener("click", () => show(index + 1));
+  viewer.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      show(index + (event.key === "ArrowRight" ? 1 : -1));
+    }
   });
   const outside = (event) => {
     const rect = viewer.getBoundingClientRect();
@@ -41,7 +66,7 @@ if (viewer && preview && typeof viewer.showModal === "function") {
   });
   viewer.addEventListener("close", () => {
     document.body.classList.remove("viewer-open");
-    preview.focus({ preventScroll: true });
+    trigger.focus({ preventScroll: true });
   });
 }
 

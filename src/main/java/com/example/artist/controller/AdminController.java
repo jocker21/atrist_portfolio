@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,6 +27,12 @@ public class AdminController {
     private final BlogService blogService;
     private final CategoryService categoryService;
     private final OrderService orderService;
+
+    @InitBinder("artwork")
+    public void artworkFields(WebDataBinder binder) {
+        binder.setAllowedFields("title", "titleEn", "description", "descriptionEn", "year", "material",
+                "surface", "genre", "technique", "widthCm", "heightCm", "price", "priceUsd", "available", "published");
+    }
 
     // ---- ARTWORK MANAGEMENT ----
 
@@ -46,17 +53,13 @@ public class AdminController {
     public String saveArtwork(
             @Valid @ModelAttribute("artwork") Artwork artwork,
             BindingResult bindingResult,
-            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+            @RequestParam(value = "additionalPhotos", required = false) List<MultipartFile> photos,
+            @RequestParam(value = "videoFile", required = false) MultipartFile video,
+            @RequestParam(value = "inputUnit", defaultValue = "cm") String unit,
             Model model) throws Exception {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", categoryService.getAll());
-            return "admin/artwork-form";
-        }
-
-        artworkService.save(artwork, imageFile, categoryIds);
-        return "redirect:/admin/artworks";
+        return saveArtworkForm(artwork, bindingResult, imageFile, categoryIds, photos, video, List.of(), false, unit, model);
     }
 
     @GetMapping("/artworks/{id}/edit")
@@ -71,18 +74,51 @@ public class AdminController {
             @PathVariable Long id,
             @Valid @ModelAttribute("artwork") Artwork artwork,
             BindingResult bindingResult,
-            @RequestParam("imageFile") MultipartFile imageFile,
+            @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
             @RequestParam(value = "categoryIds", required = false) List<Long> categoryIds,
+            @RequestParam(value = "additionalPhotos", required = false) List<MultipartFile> photos,
+            @RequestParam(value = "videoFile", required = false) MultipartFile video,
+            @RequestParam(value = "removePhotos", required = false) List<String> removePhotos,
+            @RequestParam(value = "removeVideo", defaultValue = "false") boolean removeVideo,
+            @RequestParam(value = "inputUnit", defaultValue = "cm") String unit,
             Model model) throws Exception {
-
-        if (bindingResult.hasErrors()) {
-            model.addAttribute("categories", categoryService.getAll());
-            return "admin/artwork-form";
-        }
-
         artwork.setId(id);
-        artworkService.save(artwork, imageFile, categoryIds);
-        return "redirect:/admin/artworks";
+        return saveArtworkForm(artwork, bindingResult, imageFile, categoryIds, photos, video, removePhotos, removeVideo, unit, model);
+    }
+
+    private String saveArtworkForm(Artwork artwork, BindingResult errors, MultipartFile image,
+                                   List<Long> categories, List<MultipartFile> photos, MultipartFile video,
+                                   List<String> removePhotos, boolean removeVideo, String unit, Model model) {
+        var width = artwork.getWidthCm();
+        var height = artwork.getHeightCm();
+        if (!errors.hasErrors()) {
+            try {
+                if (!unit.equals("cm") && !unit.equals("in")) throw new IllegalArgumentException("measure.invalid");
+                if (unit.equals("in")) {
+                    if (width != null) artwork.setWidthCm(width.multiply(new java.math.BigDecimal("2.54")).setScale(2, java.math.RoundingMode.HALF_UP));
+                    if (height != null) artwork.setHeightCm(height.multiply(new java.math.BigDecimal("2.54")).setScale(2, java.math.RoundingMode.HALF_UP));
+                }
+                artworkService.save(artwork, image, categories, photos, video, removePhotos, removeVideo);
+                return "redirect:/admin/artworks";
+            } catch (IllegalArgumentException ex) {
+                model.addAttribute("mediaError", ex.getMessage());
+            } catch (java.io.IOException ex) {
+                model.addAttribute("mediaError", "media.failure");
+            }
+        }
+        artwork.setWidthCm(width);
+        artwork.setHeightCm(height);
+        if (artwork.getId() != null) {
+            Artwork saved = artworkService.getById(artwork.getId());
+            artwork.setImageUrl(saved.getImageUrl());
+            artwork.setAdditionalImages(new java.util.ArrayList<>(saved.getAdditionalImages()));
+            artwork.setVideoUrl(saved.getVideoUrl());
+        }
+        model.addAttribute("categories", categoryService.getAll());
+        model.addAttribute("selectedCategoryIds", categories == null ? List.of() : categories);
+        model.addAttribute("inputUnit", unit.equals("in") ? "in" : "cm");
+        model.addAttribute("uploadsMustReselect", true);
+        return "admin/artwork-form";
     }
 
     @PostMapping("/artworks/{id}/delete")

@@ -1,0 +1,81 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+  <head th:replace="~{fragments/site :: head(#{settings.title})}"></head>
+  <body class="admin-page">
+    <nav th:replace="~{fragments/site :: adminHeader}"></nav>
+    <main class="site-container section-space settings-page">
+      <h1 th:text="#{settings.title}"></h1>
+      <nav class="settings-tabs" th:aria-label="#{settings.title}">
+        <a
+          th:each="item : ${termKinds}"
+          th:href="@{/admin/settings(kind=${item})}"
+          th:classappend="${kind == item} ? 'active'"
+          th:text="#{${'field.' + item}}"
+        ></a>
+      </nav>
+      <p
+        th:if="${saved}"
+        class="alert alert-success"
+        role="status"
+        th:text="#{settings.saved}"
+      ></p>
+      <p
+        th:if="${settingsError}"
+        class="alert alert-danger"
+        role="alert"
+        th:text="#{settings.invalid}"
+      ></p>
+      <form
+        method="post"
+        th:action="@{/admin/settings}"
+        class="term-row term-add"
+      >
+        <input type="hidden" name="kind" th:value="${kind}" />
+        <label
+          ><span th:text="#{settings.uk}"></span
+          ><input name="value" maxlength="80" required
+        /></label>
+        <label
+          ><span th:text="#{settings.en}"></span
+          ><input name="english" maxlength="80" required
+        /></label>
+        <button
+          class="button button-accent"
+          type="submit"
+          th:text="#{settings.add}"
+        ></button>
+      </form>
+      <div class="term-list">
+        <form
+          th:each="term : ${terms}"
+          method="post"
+          th:action="@{/admin/settings}"
+          class="term-row"
+        >
+          <input type="hidden" name="kind" th:value="${kind}" />
+          <label
+            ><span class="visually-hidden" th:text="#{settings.uk}"></span
+            ><input name="value" th:value="${term.value}" readonly
+          /></label>
+          <label
+            ><span class="visually-hidden" th:text="#{settings.en}"></span
+            ><input
+              name="english"
+              th:value="${term.english}"
+              maxlength="80"
+              required
+          /></label>
+          <button
+            type="submit"
+            class="term-save"
+            th:title="#{action.save}"
+            th:aria-label="#{action.save}"
+          >
+            <i data-lucide="save" aria-hidden="true"></i>
+          </button>
+        </form>
+      </div>
+    </main>
+    <script th:src="@{/js/vendor/lucide.min.js}" defer></script>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 package com.example.artist.service;
 
 import com.example.artist.entity.Artwork;
-import com.example.artist.entity.Category;
 import com.example.artist.repository.ArtworkRepository;
 import com.example.artist.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,11 +19,8 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -33,6 +29,7 @@ public class ArtworkService {
 
     private final ArtworkRepository artworkRepository;
     private final CategoryRepository categoryRepository;
+    private final ArtworkMediaStorage mediaStorage;
 
     @Value("${app.upload.dir:uploads/artworks}")
     private String uploadDir;
@@ -70,40 +67,76 @@ public class ArtworkService {
         return artwork;
     }
 
+    @Transactional(rollbackFor = IOException.class)
     public Artwork save(Artwork artwork, MultipartFile imageFile, List<Long> categoryIds) throws IOException {
-        if (artwork.getId() != null) {
-            Artwork existingArtwork = getById(artwork.getId());
-            artwork.setCreatedAt(existingArtwork.getCreatedAt());
-            artwork.setImageUrl(existingArtwork.getImageUrl());
+        return save(artwork, imageFile, categoryIds, List.of(), null, List.of(), false);
+    }
+
+    @Transactional(rollbackFor = IOException.class)
+    public Artwork save(Artwork submitted, MultipartFile imageFile, List<Long> categoryIds,
+                        List<MultipartFile> photos, MultipartFile video,
+                        List<String> removePhotos, boolean removeVideo) throws IOException {
+        Artwork target = submitted.getId() == null ? new Artwork() : artworkRepository.findForUpdate(submitted.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        var retained = new java.util.ArrayList<>(target.getAdditionalImages());
+        var removed = new java.util.ArrayList<String>();
+        for (String url : retained) {
+            if (removePhotos != null && removePhotos.contains(url)) removed.add(url);
         }
+        retained.removeAll(removed);
+        var additions = photos == null ? List.<MultipartFile>of() : photos.stream().filter(f -> !f.isEmpty()).toList();
+        if (retained.size() + additions.size() > 6) throw new IllegalArgumentException("media.tooMany");
+
+        target.setTitle(submitted.getTitle());
+        target.setTitleEn(submitted.getTitleEn());
+        target.setDescription(submitted.getDescription());
+        target.setDescriptionEn(submitted.getDescriptionEn());
+        target.setYear(submitted.getYear());
+        target.setMaterial(submitted.getMaterial());
+        target.setSurface(submitted.getSurface());
+        target.setGenre(submitted.getGenre());
+        target.setTechnique(submitted.getTechnique());
+        target.setWidthCm(submitted.getWidthCm());
+        target.setHeightCm(submitted.getHeightCm());
+        target.setPrice(submitted.getPrice());
+        target.setPriceUsd(submitted.getPriceUsd());
+        target.setAvailable(submitted.isAvailable());
+        target.setPublished(submitted.isPublished());
+        target.setCategories(categoryIds == null ? new HashSet<>() : new HashSet<>(categoryRepository.findAllById(categoryIds)));
 
         if (imageFile != null && !imageFile.isEmpty()) {
-            validateImageFile(imageFile);
-            String imagePath = saveImage(imageFile);
-            artwork.setImageUrl(imagePath);
+            String old = target.getImageUrl();
+            target.setImageUrl(mediaStorage.image(imageFile));
+            mediaStorage.removeAfterCommit(old);
         }
-
-        if (categoryIds != null && !categoryIds.isEmpty()) {
-            Set<Category> categories = new HashSet<>(categoryRepository.findAllById(categoryIds));
-            artwork.setCategories(categories);
-        } else {
-            artwork.setCategories(new HashSet<>());
+        for (MultipartFile photo : additions) retained.add(mediaStorage.image(photo));
+        target.getAdditionalImages().clear();
+        target.getAdditionalImages().addAll(retained);
+        removed.forEach(mediaStorage::removeAfterCommit);
+        if (video != null && !video.isEmpty()) {
+            String old = target.getVideoUrl();
+            target.setVideoUrl(mediaStorage.video(video));
+            mediaStorage.removeAfterCommit(old);
+        } else if (removeVideo) {
+            mediaStorage.removeAfterCommit(target.getVideoUrl());
+            target.setVideoUrl(null);
         }
-
-        return artworkRepository.save(artwork);
+        return artworkRepository.saveAndFlush(target);
     }
 
     @Transactional
     public void delete(Long id) {
         artworkRepository.findById(id).ifPresent(artwork -> {
             String imageUrl = artwork.getImageUrl();
+            artwork.getAdditionalImages().forEach(mediaStorage::removeAfterCommit);
+            mediaStorage.removeAfterCommit(artwork.getVideoUrl());
             artworkRepository.delete(artwork);
             if (imageUrl != null && !imageUrl.isBlank()) {
                 // Keep the image if deleting the database record rolls back.
                 TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
-                        deleteImage(imageUrl);
+                        if (artworkRepository.countMediaReferences(imageUrl) == 0) deleteImage(imageUrl);
                     }
                 });
             }
@@ -132,30 +165,4 @@ public class ArtworkService {
         }
     }
 
-    private void validateImageFile(MultipartFile file) {
-        String contentType = file.getContentType();
-        if (contentType == null || !contentType.startsWith("image/")) {
-            throw new IllegalArgumentException("Дозволено лише зображення");
-        }
-    }
-
-    private String saveImage(MultipartFile file) throws IOException {
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
-
-        String originalFilename = file.getOriginalFilename();
-        String extension = originalFilename != null && originalFilename.contains(".")
-                ? originalFilename.substring(originalFilename.lastIndexOf("."))
-                : ".jpg";
-        String filename = UUID.randomUUID() + extension;
-
-        Path filePath = uploadPath.resolve(filename);
-        try (var input = file.getInputStream()) {
-            Files.copy(input, filePath, StandardCopyOption.REPLACE_EXISTING);
-        }
-
-        return "uploads/artworks/" + filename;
-    }
 }

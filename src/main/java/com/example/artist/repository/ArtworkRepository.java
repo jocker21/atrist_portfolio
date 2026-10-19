@@ -7,7 +7,13 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface ArtworkRepository extends JpaRepository<Artwork, Long> {
+public interface ArtworkRepository extends JpaRepository<Artwork, Long>, org.springframework.data.jpa.repository.JpaSpecificationExecutor<Artwork> {
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT a FROM Artwork a WHERE a.id = :id")
+    java.util.Optional<Artwork> findForUpdate(@Param("id") Long id);
+
+    @Query("SELECT COUNT(DISTINCT a) FROM Artwork a LEFT JOIN a.additionalImages photo WHERE a.imageUrl = :url OR a.videoUrl = :url OR photo = :url")
+    long countMediaReferences(@Param("url") String url);
 
     List<Artwork> findByPublishedTrue();
 

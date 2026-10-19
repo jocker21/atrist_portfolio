@@ -15,7 +15,19 @@
             th:object="${artwork}"
             method="post"
             enctype="multipart/form-data"
+            data-media-form
           >
+            <p
+              th:if="${mediaError != null}"
+              class="alert alert-danger"
+              role="alert"
+              th:text="#{${mediaError}}"
+            ></p>
+            <p
+              th:if="${uploadsMustReselect == true}"
+              class="alert alert-warning"
+              th:text="#{media.reselect}"
+            ></p>
             <div class="mb-3">
               <label
                 class="form-label"
@@ -58,7 +70,7 @@
                   <label
                     class="form-label"
                     for="price"
-                    th:text="#{field.price}"
+                    th:text="#{price.uah}"
                   ></label
                   ><input
                     type="number"
@@ -75,6 +87,47 @@
             </div>
             <div class="mb-3">
               <label
+                for="priceUsd"
+                class="form-label"
+                th:text="#{price.usd}"
+              ></label>
+              <input
+                type="number"
+                id="priceUsd"
+                th:field="*{priceUsd}"
+                min="0.01"
+                step="0.01"
+                class="form-control"
+                th:classappend="${#fields.hasErrors('priceUsd')} ? 'is-invalid'"
+              />
+              <div class="invalid-feedback" th:errors="*{priceUsd}"></div>
+            </div>
+            <div class="mb-3">
+              <label
+                for="inputUnit"
+                class="form-label"
+                th:text="#{measure.units}"
+              ></label>
+              <select
+                id="inputUnit"
+                name="inputUnit"
+                class="form-select"
+                data-input-unit
+              >
+                <option
+                  value="cm"
+                  th:selected="${inputUnit != 'in'}"
+                  th:text="#{measure.cm}"
+                ></option>
+                <option
+                  value="in"
+                  th:selected="${inputUnit == 'in'}"
+                  th:text="#{measure.in}"
+                ></option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label
                 class="form-label"
                 for="genre"
                 th:text="#{field.genre}"
@@ -82,36 +135,9 @@
               ><select class="form-select" id="genre" th:field="*{genre}">
                 <option value="" th:text="#{admin.choose}"></option>
                 <option
-                  value="Портрет"
-                  th:text="${@portfolioText.term('Портрет',#locale)}"
-                ></option>
-                <option
-                  value="Пейзаж"
-                  th:text="${@portfolioText.term('Пейзаж',#locale)}"
-                ></option>
-                <option
-                  value="Натюрморт"
-                  th:text="${@portfolioText.term('Натюрморт',#locale)}"
-                ></option>
-                <option
-                  value="Абстракція"
-                  th:text="${@portfolioText.term('Абстракція',#locale)}"
-                ></option>
-                <option
-                  value="Анімалістика"
-                  th:text="${@portfolioText.term('Анімалістика',#locale)}"
-                ></option>
-                <option
-                  value="Міський пейзаж"
-                  th:text="${@portfolioText.term('Міський пейзаж',#locale)}"
-                ></option>
-                <option
-                  value="Морський пейзаж"
-                  th:text="${@portfolioText.term('Морський пейзаж',#locale)}"
-                ></option>
-                <option
-                  value="Інше"
-                  th:text="${@portfolioText.term('Інше',#locale)}"
+                  th:each="term : ${@artworkTerms.options('genre')}"
+                  th:value="${term.value}"
+                  th:text="${@artworkTerms.label('genre',term.value,#locale)}"
                 ></option>
               </select>
             </div>
@@ -130,36 +156,9 @@
                   >
                     <option value="" th:text="#{admin.choose}"></option>
                     <option
-                      value="Олія"
-                      th:text="${@portfolioText.term('Олія',#locale)}"
-                    ></option>
-                    <option
-                      value="Акварель"
-                      th:text="${@portfolioText.term('Акварель',#locale)}"
-                    ></option>
-                    <option
-                      value="Акрил"
-                      th:text="${@portfolioText.term('Акрил',#locale)}"
-                    ></option>
-                    <option
-                      value="Пастель"
-                      th:text="${@portfolioText.term('Пастель',#locale)}"
-                    ></option>
-                    <option
-                      value="Графіт"
-                      th:text="${@portfolioText.term('Графіт',#locale)}"
-                    ></option>
-                    <option
-                      value="Вугілля"
-                      th:text="${@portfolioText.term('Вугілля',#locale)}"
-                    ></option>
-                    <option
-                      value="Темпера"
-                      th:text="${@portfolioText.term('Темпера',#locale)}"
-                    ></option>
-                    <option
-                      value="Змішана техніка"
-                      th:text="${@portfolioText.term('Змішана техніка',#locale)}"
+                      th:each="term : ${@artworkTerms.options('material')}"
+                      th:value="${term.value}"
+                      th:text="${@artworkTerms.label('material',term.value,#locale)}"
                     ></option>
                   </select>
                 </div>
@@ -178,28 +177,9 @@
                   >
                     <option value="" th:text="#{admin.choose}"></option>
                     <option
-                      value="Полотно"
-                      th:text="${@portfolioText.term('Полотно',#locale)}"
-                    ></option>
-                    <option
-                      value="Папір"
-                      th:text="${@portfolioText.term('Папір',#locale)}"
-                    ></option>
-                    <option
-                      value="Картон"
-                      th:text="${@portfolioText.term('Картон',#locale)}"
-                    ></option>
-                    <option
-                      value="Дерево"
-                      th:text="${@portfolioText.term('Дерево',#locale)}"
-                    ></option>
-                    <option
-                      value="ДВП"
-                      th:text="${@portfolioText.term('ДВП',#locale)}"
-                    ></option>
-                    <option
-                      value="Оргаліт"
-                      th:text="${@portfolioText.term('Оргаліт',#locale)}"
+                      th:each="term : ${@artworkTerms.options('surface')}"
+                      th:value="${term.value}"
+                      th:text="${@artworkTerms.label('surface',term.value,#locale)}"
                     ></option>
                   </select>
                 </div>
@@ -217,7 +197,8 @@
                     type="number"
                     class="form-control"
                     id="widthCm"
-                    min="1"
+                    min="0.01"
+                    step="0.01"
                     th:field="*{widthCm}"
                     th:classappend="${#fields.hasErrors('widthCm')} ? 'is-invalid'"
                   />
@@ -235,7 +216,8 @@
                     type="number"
                     class="form-control"
                     id="heightCm"
-                    min="1"
+                    min="0.01"
+                    step="0.01"
                     th:field="*{heightCm}"
                     th:classappend="${#fields.hasErrors('heightCm')} ? 'is-invalid'"
                   />
@@ -295,6 +277,22 @@
               </div>
             </section>
             <fieldset class="mb-4">
+              <legend class="form-label" th:text="#{field.technique}"></legend>
+              <select
+                class="form-select"
+                id="technique"
+                th:field="*{technique}"
+                th:aria-label="#{field.technique}"
+              >
+                <option value="" th:text="#{admin.choose}"></option>
+                <option
+                  th:each="term : ${@artworkTerms.options('technique')}"
+                  th:value="${term.value}"
+                  th:text="${@artworkTerms.label('technique',term.value,#locale)}"
+                ></option>
+              </select>
+            </fieldset>
+            <fieldset class="mb-4">
               <legend class="form-label" th:text="#{field.categories}"></legend>
               <div class="d-flex flex-wrap gap-3">
                 <div class="form-check" th:each="cat : ${categories}">
@@ -304,7 +302,7 @@
                     name="categoryIds"
                     th:id="${'category-' + cat.id}"
                     th:value="${cat.id}"
-                    th:checked="${artwork.categories != null and artwork.categories.contains(cat)}"
+                    th:checked="${selectedCategoryIds != null ? selectedCategoryIds.contains(cat.id) : (artwork.categories != null and artwork.categories.contains(cat))}"
                   /><label
                     class="form-check-label"
                     th:for="${'category-' + cat.id}"
@@ -330,10 +328,88 @@
                 id="imageFile"
                 name="imageFile"
                 type="file"
-                accept="image/*"
+                accept="image/jpeg,image/png"
                 class="form-control"
               />
             </div>
+            <fieldset class="artwork-media-editor mb-4">
+              <legend th:text="#{media.photos}"></legend>
+              <div class="media-thumbnails admin-media-thumbnails">
+                <label
+                  class="media-edit-photo"
+                  th:each="photo, stat : ${artwork.additionalImages}"
+                >
+                  <img
+                    th:src="@{'/' + ${photo}}"
+                    th:alt="#{media.photoNumber(${stat.count})}"
+                    loading="lazy"
+                  />
+                  <span
+                    ><input
+                      type="checkbox"
+                      name="removePhotos"
+                      th:value="${photo}" />
+                    <span th:text="#{media.remove}"></span
+                  ></span>
+                </label>
+              </div>
+              <label
+                for="additionalPhotos"
+                class="form-label"
+                th:text="#{media.addPhotos}"
+              ></label>
+              <input
+                class="form-control"
+                type="file"
+                id="additionalPhotos"
+                name="additionalPhotos"
+                multiple
+                accept="image/jpeg,image/png"
+                th:attr="data-existing=${#lists.size(artwork.additionalImages)},data-count-error=#{media.tooMany},data-size-error=#{media.imageSize},data-remove-label=#{media.remove}"
+              />
+              <p class="media-limits" th:text="#{media.photoLimits}"></p>
+              <div
+                class="media-thumbnails pending-photos"
+                aria-live="polite"
+              ></div>
+            </fieldset>
+            <fieldset class="artwork-media-editor mb-4">
+              <legend th:text="#{media.video}"></legend>
+              <div th:if="${artwork.videoUrl != null}">
+                <video
+                  controls
+                  preload="metadata"
+                  playsinline
+                  class="admin-media-video"
+                  th:src="@{'/' + ${artwork.videoUrl}}"
+                ></video>
+                <label class="form-check-label"
+                  ><input type="checkbox" name="removeVideo" value="true" />
+                  <span th:text="#{media.removeVideo}"></span
+                ></label>
+              </div>
+              <label
+                for="videoFile"
+                class="form-label"
+                th:text="${artwork.videoUrl != null} ? #{media.replaceVideo} : #{media.addVideo}"
+              ></label>
+              <input
+                class="form-control"
+                type="file"
+                id="videoFile"
+                name="videoFile"
+                accept="video/mp4"
+                th:attr="data-size-error=#{media.videoSize}"
+              />
+              <p class="media-limits" th:text="#{media.videoLimits}"></p>
+              <video
+                controls
+                preload="metadata"
+                playsinline
+                class="admin-media-video pending-video"
+                hidden
+              ></video>
+            </fieldset>
             <div class="form-check mb-3">
               <input
                 class="form-check-input"
@@ -374,5 +450,6 @@
         </div>
       </div>
     </main>
+    <script th:src="@{/js/vendor/lucide.min.js}" defer></script>
   </body>
 </html>

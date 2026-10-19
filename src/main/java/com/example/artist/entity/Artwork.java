@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "artworks")
@@ -43,16 +45,41 @@ public class Artwork {
     private String material;
     private String surface;
     private String genre;
+    private String technique;
 
-    private Integer widthCm;
-    private Integer heightCm;
+    @Positive(message = "{measure.positive}")
+    @jakarta.validation.constraints.Digits(integer = 7, fraction = 2)
+    @Column(precision = 10, scale = 2)
+    private BigDecimal widthCm;
+    @Positive(message = "{measure.positive}")
+    @jakarta.validation.constraints.Digits(integer = 7, fraction = 2)
+    @Column(precision = 10, scale = 2)
+    private BigDecimal heightCm;
 
     @Positive(message = "{validation.price}")
+    @jakarta.validation.constraints.Digits(integer = 8, fraction = 2)
     @Column(precision = 10, scale = 2)
     private BigDecimal price;
+    @Positive(message = "{validation.price}")
+    @jakarta.validation.constraints.Digits(integer = 8, fraction = 2)
+    @Column(precision = 10, scale = 2)
+    private BigDecimal priceUsd;
+
+    public BigDecimal getWidthInches() { return inches(widthCm); }
+    public BigDecimal getHeightInches() { return inches(heightCm); }
+    private BigDecimal inches(BigDecimal cm) {
+        return cm == null ? null : cm.divide(new BigDecimal("2.54"), 2, java.math.RoundingMode.HALF_UP).stripTrailingZeros();
+    }
 
     private boolean available = true;
     private String imageUrl;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "artwork_photos", joinColumns = @JoinColumn(name = "artwork_id"))
+    @OrderColumn(name = "photo_order")
+    @Column(name = "image_url", nullable = false)
+    private List<String> additionalImages = new ArrayList<>();
+
+    private String videoUrl;
     private LocalDate createdAt;
     private boolean published = true;
 

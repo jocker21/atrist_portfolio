@@ -32,6 +32,7 @@
             <span th:text="${order.artwork.price}"></span>
             <span th:text="#{currency}"></span>
           </p>
+          <p th:if="${order.artwork.priceUsd != null}"><span th:text="${order.artwork.priceUsd}"></span> USD</p>
           <form
             th:action="@{/admin/orders/{id}/status(id=${order.id})}"
             method="post"

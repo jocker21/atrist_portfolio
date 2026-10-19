@@ -114,13 +114,15 @@ class PortfolioRegressionTests {
 
     @Test
     void uploadedImagesAreServed() throws Exception {
+        var bytes = new java.io.ByteArrayOutputStream();
+        javax.imageio.ImageIO.write(new java.awt.image.BufferedImage(2, 2, java.awt.image.BufferedImage.TYPE_INT_RGB), "png", bytes);
         Artwork artwork = artwork(true);
         Artwork saved = artworkService.save(artwork,
-                new MockMultipartFile("imageFile", "test.png", "image/png", new byte[]{1, 2, 3}), List.of());
+                new MockMultipartFile("imageFile", "test.png", "image/png", bytes.toByteArray()), List.of());
         Path image = Path.of(saved.getImageUrl());
         try {
             mvc.perform(get("/" + saved.getImageUrl())).andExpect(status().isOk())
-                    .andExpect(content().bytes(new byte[]{1, 2, 3}));
+                    .andExpect(content().contentTypeCompatibleWith("image/png"));
         } finally {
             Files.deleteIfExists(image);
         }

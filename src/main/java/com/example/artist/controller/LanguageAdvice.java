@@ -16,6 +16,8 @@ public class LanguageAdvice {
     @ModelAttribute
     public void languageLinks(HttpServletRequest request, Model model) {
         model.addAttribute("artistProfile", profiles.get());
+        model.addAttribute("termKinds", java.util.List.of("material","surface","technique","genre"));
+        model.addAttribute("socialNames", java.util.List.of("instagram","telegram","facebook","threads"));
         // Preserve gallery filters and pagination when changing language.
         var uri = UriComponentsBuilder.fromPath(request.getRequestURI()).query(request.getQueryString());
         model.addAttribute("languageUkUrl", uri.cloneBuilder().replaceQueryParam("lang", "uk").build().toUriString());

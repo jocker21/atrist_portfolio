@@ -11,6 +11,20 @@
           <p th:text="#{contact.intro}"></p>
           <div class="contact-rule"></div>
           <p class="contact-note" th:text="#{contact.note}"></p>
+          <div class="social-placeholders">
+            <button
+              th:each="social : ${socialNames}"
+              type="button"
+              disabled
+              th:title="#{social.pending}"
+              th:aria-label="${social + ': ' + #messages.msg('social.pending')}"
+            >
+              <img
+                th:src="@{'/images/social/' + ${social} + '.svg'}"
+                alt=""
+              /><span th:text="${#strings.capitalize(social)}"></span>
+            </button>
+          </div>
         </section>
         <section class="form-section">
           <div

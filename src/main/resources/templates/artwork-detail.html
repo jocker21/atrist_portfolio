@@ -11,30 +11,62 @@
         ><span th:text="#{action.gallery}"></span
       ></a>
       <div class="artwork-detail">
-        <div class="detail-image">
-          <a
-            class="image-preview-trigger"
-            data-image-preview
-            th:if="${!#strings.isEmpty(artwork.imageUrl)}"
-            th:href="@{'/' + ${artwork.imageUrl}}"
-            th:title="#{viewer.open}"
-            th:aria-label="#{viewer.open}"
-          >
-            <img
-              th:src="@{'/' + ${artwork.imageUrl}}"
-              th:alt="${@portfolioText.title(artwork,#locale)}"
-            />
-            <span class="preview-icon" aria-hidden="true"
-              ><i data-lucide="expand"></i
+        <div class="artwork-visuals">
+          <div class="detail-image">
+            <a
+              class="image-preview-trigger"
+              data-image-preview
+              th:if="${!#strings.isEmpty(artwork.imageUrl)}"
+              th:href="@{'/' + ${artwork.imageUrl}}"
+              th:title="#{viewer.open}"
+              th:aria-label="#{viewer.open}"
+            >
+              <img
+                th:src="@{'/' + ${artwork.imageUrl}}"
+                th:alt="${@portfolioText.title(artwork,#locale)}"
+              />
+              <span class="preview-icon" aria-hidden="true"
+                ><i data-lucide="expand"></i
+              ></span>
+            </a>
+            <span
+              class="image-missing"
+              th:unless="${!#strings.isEmpty(artwork.imageUrl)}"
+              th:text="#{image.none}"
             ></span>
-          </a>
-          <span
-            class="image-missing"
-            th:unless="${!#strings.isEmpty(artwork.imageUrl)}"
-            th:text="#{image.none}"
-          ></span>
+          </div>
+          <div
+            class="media-thumbnails"
+            th:if="${!#lists.isEmpty(artwork.additionalImages)}"
+            th:aria-label="#{media.photos}"
+          >
+            <a
+              th:each="photo, stat : ${artwork.additionalImages}"
+              data-image-preview
+              class="media-thumbnail"
+              th:href="@{'/' + ${photo}}"
+              th:title="#{media.photoNumber(${stat.count})}"
+              th:aria-label="#{media.photoNumber(${stat.count})}"
+            >
+              <img
+                th:src="@{'/' + ${photo}}"
+                th:alt="#{media.photoNumber(${stat.count})}"
+                loading="lazy"
+              />
+            </a>
+          </div>
+          <div class="artwork-video" th:if="${artwork.videoUrl != null}">
+            <a
+              class="text-link video-trigger"
+              data-video-open
+              th:href="@{'/' + ${artwork.videoUrl}}"
+              ><i data-lucide="play" aria-hidden="true"></i
+              ><span th:text="#{media.watchVideo}"></span
+            ></a>
+          </div>
         </div>
         <section class="detail-copy">
+          <div th:replace="~{fragments/site :: displayPreferences}"></div>
           <p class="eyebrow section-number" th:text="${artwork.year}"></p>
           <h1 th:text="${@portfolioText.title(artwork,#locale)}"></h1>
           <p class="availability">
@@ -46,34 +78,42 @@
               th:text="${artwork.available} ? #{artwork.available} : #{artwork.sold}"
             ></span>
           </p>
-          <p class="price" th:if="${artwork.price != null}">
-            <span th:text="${artwork.price}"></span>
-            <span th:text="#{currency}"></span>
-          </p>
+          <p th:replace="~{fragments/site :: price(${artwork})}"></p>
           <dl class="artwork-facts">
+            <div th:if="${!#strings.isEmpty(artwork.technique)}">
+              <dt th:text="#{field.technique}"></dt>
+              <dd
+                th:text="${@artworkTerms.label('technique',artwork.technique,#locale)}"
+              ></dd>
+            </div>
             <div th:if="${!#strings.isEmpty(artwork.material)}">
               <dt th:text="#{field.material}"></dt>
               <dd
-                th:text="${@portfolioText.term(artwork.material,#locale)}"
+                th:text="${@artworkTerms.label('material',artwork.material,#locale)}"
               ></dd>
             </div>
             <div th:if="${!#strings.isEmpty(artwork.surface)}">
               <dt th:text="#{field.surface}"></dt>
               <dd
-                th:text="${@portfolioText.term(artwork.surface,#locale)}"
+                th:text="${@artworkTerms.label('surface',artwork.surface,#locale)}"
               ></dd>
             </div>
             <div th:if="${!#strings.isEmpty(artwork.genre)}">
               <dt th:text="#{field.genre}"></dt>
-              <dd th:text="${@portfolioText.term(artwork.genre,#locale)}"></dd>
+              <dd
+                th:text="${@artworkTerms.label('genre',artwork.genre,#locale)}"
+              ></dd>
             </div>
             <div
               th:if="${artwork.widthCm != null and artwork.heightCm != null}"
             >
               <dt th:text="#{field.dimensions}"></dt>
-              <dd>
+              <dd
+                data-dimensions
+                th:attr="data-cm=${artwork.widthCm.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightCm.stripTrailingZeros().toPlainString() + ' ' + #messages.msg('unit.cm')},data-in=${artwork.widthInches.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightInches.stripTrailingZeros().toPlainString() + ' ' + #messages.msg('unit.in')}"
+              >
                 <span
-                  th:text="${artwork.widthCm + ' × ' + artwork.heightCm}"
+                  th:text="${artwork.widthCm.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightCm}"
                 ></span>
                 <span th:text="#{unit.cm}"></span>
               </dd>
@@ -115,6 +155,48 @@
         id="viewer-caption"
         th:text="${@portfolioText.title(artwork,#locale)}"
       ></p>
+      <div class="viewer-navigation">
+        <button
+          type="button"
+          data-viewer-previous
+          th:title="#{viewer.previous}"
+          th:aria-label="#{viewer.previous}"
+        >
+          <i data-lucide="chevron-left" aria-hidden="true"></i>
+        </button>
+        <span data-viewer-counter aria-live="polite"></span>
+        <button
+          type="button"
+          data-viewer-next
+          th:title="#{viewer.next}"
+          th:aria-label="#{viewer.next}"
+        >
+          <i data-lucide="chevron-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </dialog>
+    <dialog
+      class="video-viewer"
+      th:if="${artwork.videoUrl != null}"
+      th:aria-label="#{media.video}"
+    >
+      <form method="dialog">
+        <button
+          class="viewer-close"
+          autofocus
+          th:title="#{viewer.close}"
+          th:aria-label="#{viewer.close}"
+        >
+          <i data-lucide="x" aria-hidden="true"></i>
+        </button>
+      </form>
+      <video
+        controls
+        playsinline
+        preload="none"
+        th:poster="${artwork.imageUrl != null} ? @{'/' + ${artwork.imageUrl}} : null"
+        th:aria-label="#{media.video}"
+      ></video>
     </dialog>
     <script th:src="@{/js/vendor/lucide.min.js}" defer></script>
     <footer th:replace="~{fragments/site :: footer}"></footer>

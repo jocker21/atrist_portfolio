@@ -9,25 +9,135 @@
         <h1 th:text="#{nav.gallery}"></h1>
         <p th:text="#{gallery.intro}"></p>
       </div>
-      <nav class="gallery-filters" th:aria-label="#{gallery.filters}">
-        <a
-          th:href="@{/gallery}"
-          th:classappend="${activeCategory == null and activeYear == null} ? 'active'"
-          th:text="#{gallery.all}"
-        ></a>
-        <a
-          th:each="cat : ${categories}"
-          th:href="@{/gallery(category=${cat.slug})}"
-          th:text="${@portfolioText.term(cat.name,#locale)}"
-          th:classappend="${activeCategory == cat.slug} ? 'active'"
-        ></a>
-        <a
-          th:each="y : ${years}"
-          th:href="@{/gallery(year=${y})}"
-          th:text="${y}"
-          th:classappend="${activeYear == y} ? 'active'"
-        ></a>
-      </nav>
+      <form
+        class="gallery-toolbar"
+        method="get"
+        th:action="@{/gallery}"
+        th:object="${filters}"
+        data-gallery-filter
+      >
+        <div class="gallery-filter-grid">
+          <label
+            ><span th:text="#{field.material}"></span>
+            <select th:field="*{material}">
+              <option value="" th:text="#{gallery.all}"></option>
+              <option
+                th:each="termValue : ${filterValues['material']}"
+                th:value="${termValue}"
+                th:text="${@artworkTerms.label('material',termValue,#locale)}"
+              ></option></select
+          ></label>
+          <label
+            ><span th:text="#{field.surface}"></span>
+            <select th:field="*{surface}">
+              <option value="" th:text="#{gallery.all}"></option>
+              <option
+                th:each="termValue : ${filterValues['surface']}"
+                th:value="${termValue}"
+                th:text="${@artworkTerms.label('surface',termValue,#locale)}"
+              ></option></select
+          ></label>
+          <label
+            ><span th:text="#{field.technique}"></span>
+            <select th:field="*{technique}">
+              <option value="" th:text="#{gallery.all}"></option>
+              <option
+                th:each="termValue : ${filterValues['technique']}"
+                th:value="${termValue}"
+                th:text="${@artworkTerms.label('technique',termValue,#locale)}"
+              ></option></select
+          ></label>
+          <label
+            ><span th:text="#{field.genre}"></span>
+            <select th:field="*{genre}">
+              <option value="" th:text="#{gallery.all}"></option>
+              <option
+                th:each="termValue : ${filterValues['genre']}"
+                th:value="${termValue}"
+                th:text="${@artworkTerms.label('genre',termValue,#locale)}"
+              ></option></select
+          ></label>
+          <label
+            ><span th:text="#{field.year}"></span
+            ><select th:field="*{year}">
+              <option value="" th:text="#{gallery.all}"></option>
+              <option
+                th:each="y : ${years}"
+                th:value="${y}"
+                th:text="${y}"
+              ></option></select
+          ></label>
+          <label
+            ><span th:text="#{filter.availability}"></span
+            ><select th:field="*{availability}">
+              <option value="all" th:text="#{gallery.all}"></option>
+              <option value="available" th:text="#{artwork.available}"></option>
+              <option value="sold" th:text="#{artwork.sold}"></option></select
+          ></label>
+          <label
+            ><span th:text="#{filter.min}"></span
+            ><input type="number" min="0" step="0.01" th:field="*{priceMin}"
+          /></label>
+          <label
+            ><span th:text="#{filter.max}"></span
+            ><input type="number" min="0" step="0.01" th:field="*{priceMax}"
+          /></label>
+        </div>
+        <div class="gallery-toolbar-bottom">
+          <div class="display-preferences">
+            <label
+              ><span th:text="#{price.currency}"></span
+              ><select th:field="*{currency}" data-preference="currency">
+                <option value="UAH">UAH ₴</option>
+                <option value="USD">USD $</option>
+              </select></label
+            >
+            <label
+              ><span th:text="#{measure.units}"></span
+              ><select data-preference="unit">
+                <option value="cm" th:text="#{measure.cm}"></option>
+                <option value="in" th:text="#{measure.in}"></option></select
+            ></label>
+          </div>
+          <label class="sort-control"
+            ><span th:text="#{filter.sort}"></span
+            ><select th:field="*{sort}">
+              <option value="newest" th:text="#{sort.newest}"></option>
+              <option value="oldest" th:text="#{sort.oldest}"></option>
+              <option value="priceAsc" th:text="#{sort.priceAsc}"></option>
+              <option value="priceDesc" th:text="#{sort.priceDesc}"></option>
+              <option value="title" th:text="#{sort.title}"></option></select
+          ></label>
+          <input
+            th:if="${filters.category != null}"
+            type="hidden"
+            name="category"
+            th:value="${filters.category}"
+          />
+          <button
+            class="button button-accent"
+            type="submit"
+            th:text="#{filter.apply}"
+          ></button>
+          <a
+            class="text-link"
+            th:href="@{/gallery}"
+            data-reset-filters
+            th:text="#{filter.reset}"
+          ></a>
+        </div>
+      </form>
+      <p
+        th:if="${filterError}"
+        class="alert alert-danger"
+        th:text="#{filter.invalid}"
+        role="alert"
+      ></p>
+      <p
+        class="gallery-result-count"
+        role="status"
+        th:text="#{filter.count(${#lists.size(artworks)})}"
+      ></p>
       <p
         th:if="${#lists.isEmpty(artworks)}"
         class="empty-state"

@@ -15,6 +15,7 @@
     />
     <link th:href="@{/css/style.css}" rel="stylesheet" />
     <script th:src="@{/js/site.js}" defer></script>
+    <script th:src="@{/js/artwork-media.js}" defer></script>
   </head>
   <body>
     <header th:fragment="header(active)" class="site-header">
@@ -85,6 +86,7 @@
         <a th:href="@{/admin/artworks}" th:text="#{admin.artworks}"></a
         ><a th:href="@{/admin/blog}" th:text="#{nav.blog}"></a>
         <a th:href="@{/admin/profile}" th:text="#{nav.about}"></a>
+        <a th:href="@{/admin/settings}" th:text="#{settings.title}"></a>
         <a th:href="@{/admin/orders}" th:text="#{admin.orders}"></a
         ><a th:href="@{/}" th:text="#{nav.site}"></a>
         <nav class="language-switch" th:aria-label="#{language}">
@@ -117,6 +119,35 @@
         <a th:href="@{/contact}" th:text="#{footer.contact}"></a>
       </div>
     </footer>
+    <div th:fragment="displayPreferences" class="display-preferences">
+      <label
+        ><span th:text="#{price.currency}"></span
+        ><select data-preference="currency" th:aria-label="#{price.currency}">
+          <option value="UAH">UAH ₴</option>
+          <option value="USD">USD $</option>
+        </select></label
+      >
+      <label
+        ><span th:text="#{measure.units}"></span
+        ><select data-preference="unit" th:aria-label="#{measure.units}">
+          <option value="cm" th:text="#{measure.cm}"></option>
+          <option value="in" th:text="#{measure.in}"></option></select
+      ></label>
+    </div>
+    <p
+      th:fragment="price(artwork)"
+      class="artwork-price"
+      data-price
+      th:attr="data-uah=${artwork.price},data-usd=${artwork.priceUsd},data-request=#{price.request}"
+      th:text="${artwork.price != null ? artwork.price + ' UAH' : (artwork.priceUsd != null ? artwork.priceUsd + ' USD' : #messages.msg('price.request'))}"
+    ></p>
+    <span
+      th:fragment="dimensions(artwork)"
+      th:if="${artwork.widthCm != null and artwork.heightCm != null}"
+      data-dimensions
+      th:attr="data-cm=${artwork.widthCm.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightCm.stripTrailingZeros().toPlainString() + ' ' + #messages.msg('unit.cm')},data-in=${artwork.widthInches.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightInches.stripTrailingZeros().toPlainString() + ' ' + #messages.msg('unit.in')}"
+      th:text="${artwork.widthCm.stripTrailingZeros().toPlainString() + ' × ' + artwork.heightCm.stripTrailingZeros().toPlainString() + ' ' + #messages.msg('unit.cm')}"
+    ></span>
     <article th:fragment="artworkCard(artwork)" class="work-card">
       <a class="work-image" th:href="@{/gallery/{id}(id=${artwork.id})}">
         <img
@@ -133,7 +164,7 @@
       <div class="work-meta">
         <span th:text="${artwork.year}"></span
         ><span
-          th:text="${@portfolioText.term(artwork.material,#locale)}"
+          th:text="${@artworkTerms.label('material',artwork.material,#locale)}"
         ></span>
       </div>
       <h3>
@@ -146,6 +177,13 @@
         ><span th:text="#{action.details}"></span
         ><span aria-hidden="true">↗</span></a
       >
+      <p th:replace="~{fragments/site :: price(${artwork})}"></p>
+      <p
+        class="work-meta"
+        th:if="${artwork.widthCm != null and artwork.heightCm != null}"
+      >
+        <span th:replace="~{fragments/site :: dimensions(${artwork})}"></span>
+      </p>
     </article>
   </body>
 </html>
